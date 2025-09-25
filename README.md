@@ -1,10 +1,11 @@
 # SGI 2025/2026
 
-## Group T0xG0y
+## Group T07G03
 | Name             | Number    | E-Mail             |
 | ---------------- | --------- | ------------------ |
 | Rodrigo Ribeiro        | 202206396 | up202206396@up.pt               |
-| Jane Doe         | 202201011 | ...                |
+| Rodrigo Resende        | 202108750 | up202108750@up.pt               |
+| Nuno Rios              | 202206272 | up202206272@up.pt               |
 
 ----
 
