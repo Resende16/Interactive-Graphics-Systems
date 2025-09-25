@@ -3,7 +3,7 @@
 ## Group T0xG0y
 | Name             | Number    | E-Mail             |
 | ---------------- | --------- | ------------------ |
-| John Doe         | 202201010 | ...                |
+| Rodrigo Ribeiro        | 202206396 | up202206396@up.pt               |
 | Jane Doe         | 202201011 | ...                |
 
 ----
