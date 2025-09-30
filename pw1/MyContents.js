@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { MyAxis } from './MyAxis.js';
 import { MyTable } from './MyTable.js';
-
+import { MyPainting } from './MyPainting.js';
 
 /**
  *  This class contains the contents of out application
@@ -84,8 +84,12 @@ class MyContents  {
         this.planeMesh.position.y = -0;
         this.app.scene.add( this.planeMesh );
 
-        let table = new MyTable(this)
-        this.app.scene.add(table)
+        //let table = new MyTable(this)
+        //this.app.scene.add(table)
+
+        const painting = new MyPainting(this)
+        painting.position.y += 5
+        this.app.scene.add(painting)
     }
     
     /**

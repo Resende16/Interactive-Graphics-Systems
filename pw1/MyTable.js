@@ -43,7 +43,7 @@ export class MyTable extends THREE.Group {
             this.makeLeg(-x,  z),
             this.makeLeg( x, -z),
             this.makeLeg(-x, -z)
-        );
+        )
     }
 
     makeLeg(x, z) {
