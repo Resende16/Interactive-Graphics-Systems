@@ -23,12 +23,26 @@ class MyContents  {
         this.lastBoxEnabled = null
         this.boxDisplacement = new THREE.Vector3(0,2,0)
 
+        // room dimensions (shared between walls and floor)
+        this.roomSize = 20; // Tamanho da sala (comprimento e largura)
+
         // plane related attributes
         this.diffusePlaneColor = "#00ffff"
         this.specularPlaneColor = "#777777"
         this.planeShininess = 30
         this.planeMaterial = new THREE.MeshPhongMaterial({ color: this.diffusePlaneColor, 
             specular: this.specularPlaneColor, emissive: "#000000", shininess: this.planeShininess })
+
+        // walls related attributes
+        this.wallsEnabled = true
+        this.lastWallsEnabled = null
+        this.walls = []
+        this.wallMaterial = new THREE.MeshPhongMaterial({ 
+            color: "#ad927fff", 
+            specular: "#333333", 
+            emissive: "#000000", 
+            shininess: 30 
+        })
     }
 
     /**
@@ -44,8 +58,58 @@ class MyContents  {
         this.boxMesh.position.y = this.boxDisplacement.y;
         this.boxMesh.rotation.x = Math.PI / 6;
         this.boxMesh.scale.set(3,2,1);
-        //this.boxMesh.rotateX(Math.PI /6);
-        //this.boxMesh.rotateX(Math.PI /6);
+    }
+
+    /**
+     * builds the four walls
+     */
+    buildWalls() {
+        // Clear existing walls
+        this.walls.forEach(wall => {
+            this.app.scene.remove(wall);
+        });
+        this.walls = [];
+
+        const wallHeight = 8;
+        const wallLength = this.roomSize; // Usar o tamanho da sala
+        const wallThickness = 0.3;
+
+        // Wall positions: front, back, left, right
+        const wallConfigs = [
+            { position: [0, wallHeight/2, wallLength/2], rotation: [0, 0, 0], size: [wallLength, wallHeight, wallThickness] }, // Front wall
+            { position: [0, wallHeight/2, -wallLength/2], rotation: [0, 0, 0], size: [wallLength, wallHeight, wallThickness] }, // Back wall
+            { position: [-wallLength/2, wallHeight/2, 0], rotation: [0, Math.PI/2, 0], size: [wallLength, wallHeight, wallThickness] }, // Left wall
+            { position: [wallLength/2, wallHeight/2, 0], rotation: [0, Math.PI/2, 0], size: [wallLength, wallHeight, wallThickness] }  // Right wall
+        ];
+
+        wallConfigs.forEach(config => {
+            const wallGeometry = new THREE.BoxGeometry(...config.size);
+            const wallMesh = new THREE.Mesh(wallGeometry, this.wallMaterial);
+            wallMesh.position.set(...config.position);
+            wallMesh.rotation.set(...config.rotation);
+            
+            this.walls.push(wallMesh);
+            if (this.wallsEnabled) {
+                this.app.scene.add(wallMesh);
+            }
+        });
+    }
+
+    /**
+     * builds the floor plane
+     */
+    buildFloor() {
+        // Remove existing floor if it exists
+        if (this.planeMesh !== undefined && this.planeMesh !== null) {
+            this.app.scene.remove(this.planeMesh);
+        }
+
+        // Create a Plane Mesh with the same size as the room
+        let plane = new THREE.PlaneGeometry(this.roomSize, this.roomSize);
+        this.planeMesh = new THREE.Mesh(plane, this.planeMaterial);
+        this.planeMesh.rotation.x = -Math.PI / 2;
+        this.planeMesh.position.y = 0;
+        this.app.scene.add(this.planeMesh);
     }
 
     /**
@@ -76,16 +140,15 @@ class MyContents  {
 
         this.buildBox()
         
-        // Create a Plane Mesh with basic material
-        
-        let plane = new THREE.PlaneGeometry( 10, 10 );
-        this.planeMesh = new THREE.Mesh( plane, this.planeMaterial );
-        this.planeMesh.rotation.x = -Math.PI / 2;
-        this.planeMesh.position.y = -0;
-        this.app.scene.add( this.planeMesh );
+        // Build floor with room size
+        this.buildFloor();
 
-        //let table = new MyTable(this)
-        //this.app.scene.add(table)
+        // Build walls
+        this.buildWalls();
+
+        // Create and add table
+        let table = new MyTable(this)
+        this.app.scene.add(table)
 
         const painting = new MyPainting(this)
         painting.position.y += 5
@@ -100,6 +163,7 @@ class MyContents  {
         this.diffusePlaneColor = value
         this.planeMaterial.color.set(this.diffusePlaneColor)
     }
+    
     /**
      * updates the specular plane color and the material
      * @param {THREE.Color} value 
@@ -108,6 +172,7 @@ class MyContents  {
         this.specularPlaneColor = value
         this.planeMaterial.specular.set(this.specularPlaneColor)
     }
+    
     /**
      * updates the plane shininess and the material
      * @param {number} value 
@@ -129,6 +194,13 @@ class MyContents  {
         this.buildBox();
         this.lastBoxEnabled = null
     }
+
+    /**
+     * rebuilds the floor with current room size
+     */
+    rebuildFloor() {
+        this.buildFloor();
+    }
     
     /**
      * updates the box mesh if required
@@ -148,6 +220,24 @@ class MyContents  {
     }
 
     /**
+     * updates the walls visibility if required
+     * this method is called from the render method of the app
+     * updates are triggered by wallsEnabled property changes
+     */
+    updateWallsIfRequired() {
+        if (this.wallsEnabled !== this.lastWallsEnabled) {
+            this.lastWallsEnabled = this.wallsEnabled
+            this.walls.forEach(wall => {
+                if (this.wallsEnabled) {
+                    this.app.scene.add(wall)
+                } else {
+                    this.app.scene.remove(wall)
+                }
+            });
+        }
+    }
+
+    /**
      * updates the contents
      * this method is called from the render method of the app
      * 
@@ -156,13 +246,14 @@ class MyContents  {
         // check if box mesh needs to be updated
         this.updateBoxIfRequired()
 
+        // check if walls need to be updated
+        this.updateWallsIfRequired()
+
         // sets the box mesh position based on the displacement vector
         this.boxMesh.position.x = this.boxDisplacement.x
         this.boxMesh.position.y = this.boxDisplacement.y
         this.boxMesh.position.z = this.boxDisplacement.z
-        
     }
-
 }
 
 export { MyContents };

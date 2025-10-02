@@ -51,6 +51,11 @@ class MyGuiInterface  {
         planeFolder.add(this.contents, 'planeShininess', 0, 1000).name("shininess").onChange( (value) => { this.contents.updatePlaneShininess(value) } );
         planeFolder.open();
 
+        // adds a folder to the gui interface for the walls
+        const wallsFolder = this.datgui.addFolder( 'Walls' );
+        wallsFolder.add(this.contents, 'wallsEnabled', true).name("enabled");
+        wallsFolder.open();
+
         // adds a folder to the gui interface for the camera
         const cameraFolder = this.datgui.addFolder('Camera')
         cameraFolder.add(this.app, 'activeCameraName', [ 'Perspective', 'Perspective2', 'Left', 'Top', 'Front','Right','Back'] ).name("active camera");
