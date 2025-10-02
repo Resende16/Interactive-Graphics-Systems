@@ -31,7 +31,6 @@ class MyGuiInterface  {
     init() {
         // add a folder to the gui interface for the box
         const boxFolder = this.datgui.addFolder( 'Box' );
-        // note that we are using a property from the contents object 
         boxFolder.add(this.contents, 'boxMeshSize', 0, 10).name("size").onChange( () => { this.contents.rebuildBox() } );
         boxFolder.add(this.contents, 'boxEnabled', true).name("enabled");
         boxFolder.add(this.contents.boxDisplacement, 'x', -5, 5)
@@ -42,6 +41,7 @@ class MyGuiInterface  {
         const data = {  
             'diffuse color': this.contents.diffusePlaneColor,
             'specular color': this.contents.specularPlaneColor,
+            'chair color': this.contents.chairColor
         };
 
         // adds a folder to the gui interface for the plane
@@ -56,10 +56,16 @@ class MyGuiInterface  {
         wallsFolder.add(this.contents, 'wallsEnabled', true).name("enabled");
         wallsFolder.open();
 
+        // adds a folder to the gui interface for the chair
+        const chairFolder = this.datgui.addFolder( 'Chair' );
+        chairFolder.add(this.contents, 'chairEnabled', true).name("enabled");
+        chairFolder.addColor( data, 'chair color' ).onChange( (value) => { this.contents.updateChairColor(value) } );
+        chairFolder.add(this.contents, 'chairRotation', 0, 2 * Math.PI).name("rotation").onChange( (value) => { this.contents.updateChairRotation(value) } );
+        chairFolder.open();
+
         // adds a folder to the gui interface for the camera
         const cameraFolder = this.datgui.addFolder('Camera')
         cameraFolder.add(this.app, 'activeCameraName', [ 'Perspective', 'Perspective2', 'Left', 'Top', 'Front','Right','Back'] ).name("active camera");
-        // note that we are using a property from the app 
         cameraFolder.add(this.app.activeCamera.position, 'x', 0, 10).name("x coord")
         cameraFolder.open()
     }

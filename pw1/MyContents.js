@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { MyAxis } from './MyAxis.js';
 import { MyTable } from './MyTable.js';
 import { MyPainting } from './MyPainting.js';
+import { MyChair } from './MyChair.js'; // Import the new Chair class
 
 /**
  *  This class contains the contents of out application
@@ -38,11 +39,18 @@ class MyContents  {
         this.lastWallsEnabled = null
         this.walls = []
         this.wallMaterial = new THREE.MeshPhongMaterial({ 
-            color: "#ad927fff", 
+            color: "#cdaa90ff", 
             specular: "#333333", 
             emissive: "#000000", 
             shininess: 30 
         })
+
+        // chair related attributes
+        this.chairEnabled = true
+        this.lastChairEnabled = null
+        this.chair = null
+        this.chairColor = 0x4A90E2 // New color: blue
+        this.chairRotation = 520 // 180 degrees in radians
     }
 
     /**
@@ -113,6 +121,46 @@ class MyContents  {
     }
 
     /**
+     * builds the chair
+     */
+    buildChair() {
+        // Remove existing chair if it exists
+        if (this.chair !== undefined && this.chair !== null) {
+            this.app.scene.remove(this.chair);
+        }
+
+        // Create the chair with custom color and rotation
+        this.chair = new MyChair(this, this.chairColor, this.chairRotation);
+        
+        // Position the chair next to the table
+        this.chair.position.set(3, 0, 0); // 3 units to the right of the table
+
+        if (this.chairEnabled) {
+            this.app.scene.add(this.chair);
+        }
+    }
+
+    /**
+     * updates the chair color
+     * @param {number} value - The new color in hexadecimal
+     */
+    updateChairColor(value) {
+        this.chairColor = value
+        if (this.chair !== null) {
+            this.chair.updateColor(value)
+        }
+    }
+
+    /**
+     * updates the chair rotation
+     * @param {number} value - The rotation in radians
+     */
+    updateChairRotation(value) {
+        this.chairRotation = value
+        this.rebuildChair()
+    }
+
+    /**
      * initializes the contents
      */
     init() {
@@ -149,6 +197,9 @@ class MyContents  {
         // Create and add table
         let table = new MyTable(this)
         this.app.scene.add(table)
+
+        // Create and add chair
+        this.buildChair();
 
         const painting = new MyPainting(this)
         painting.position.y += 5
@@ -201,6 +252,13 @@ class MyContents  {
     rebuildFloor() {
         this.buildFloor();
     }
+
+    /**
+     * rebuilds the chair
+     */
+    rebuildChair() {
+        this.buildChair();
+    }
     
     /**
      * updates the box mesh if required
@@ -238,6 +296,22 @@ class MyContents  {
     }
 
     /**
+     * updates the chair visibility if required
+     * this method is called from the render method of the app
+     * updates are triggered by chairEnabled property changes
+     */
+    updateChairIfRequired() {
+        if (this.chairEnabled !== this.lastChairEnabled) {
+            this.lastChairEnabled = this.chairEnabled
+            if (this.chairEnabled) {
+                this.app.scene.add(this.chair)
+            } else {
+                this.app.scene.remove(this.chair)
+            }
+        }
+    }
+
+    /**
      * updates the contents
      * this method is called from the render method of the app
      * 
@@ -248,6 +322,9 @@ class MyContents  {
 
         // check if walls need to be updated
         this.updateWallsIfRequired()
+
+        // check if chair needs to be updated
+        this.updateChairIfRequired()
 
         // sets the box mesh position based on the displacement vector
         this.boxMesh.position.x = this.boxDisplacement.x
