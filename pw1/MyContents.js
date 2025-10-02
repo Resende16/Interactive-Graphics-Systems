@@ -28,7 +28,7 @@ class MyContents  {
         this.roomSize = 20; // Tamanho da sala (comprimento e largura)
 
         // plane related attributes
-        this.diffusePlaneColor = "#00ffff"
+        this.diffusePlaneColor = "#7294ca"
         this.specularPlaneColor = "#777777"
         this.planeShininess = 30
         this.planeMaterial = new THREE.MeshPhongMaterial({ color: this.diffusePlaneColor, 
@@ -203,6 +203,8 @@ class MyContents  {
 
         const painting = new MyPainting(this)
         painting.position.y += 5
+        painting.position.x += 9.7
+        painting.position.z += 5
         this.app.scene.add(painting)
     }
     
