@@ -6,8 +6,8 @@ export class MyPainting extends THREE.Group {
         this.app = app
 
         // Painting itself
-        this.w = 1.5
-        this.h = 2
+        this.w = 3
+        this.h = 4
         this.d = 0.05
 
         // Frame
@@ -53,6 +53,9 @@ export class MyPainting extends THREE.Group {
 
         const left = makeStrip(geoH, -this.w/2 - this.fw/2, 0, 0);
         const right = makeStrip(geoH, this.w/2 + this.fw/2, 0, 0);
+
+        
+
 
         this.add(left, right, top, bottom)
     }

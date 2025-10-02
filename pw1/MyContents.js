@@ -203,9 +203,21 @@ class MyContents  {
 
         const painting = new MyPainting(this)
         painting.position.y += 5
-        painting.position.x += 9.7
-        painting.position.z += 5
+        painting.position.x += 9.8
+        painting.position.z += -4
+
+        painting.rotation.y += Math.PI/2
+
         this.app.scene.add(painting)
+
+        const painting2 = new MyPainting(this)
+        painting2.position.y += 5
+        painting2.position.x += 9.8
+        painting2.position.z += 4
+
+        painting2.rotation.y += Math.PI/2
+
+        this.app.scene.add(painting2)
     }
     
     /**
