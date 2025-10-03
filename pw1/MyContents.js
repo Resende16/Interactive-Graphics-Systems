@@ -1,8 +1,9 @@
+
 import * as THREE from 'three';
 import { MyAxis } from './MyAxis.js';
 import { MyTable } from './MyTable.js';
 import { MyPainting } from './MyPainting.js';
-import { MyChair } from './MyChair.js'; // Import the new Chair class
+import { MyChair } from './MyChair.js';
 
 /**
  *  This class contains the contents of out application
@@ -20,15 +21,15 @@ class MyContents  {
         // box related attributes
         this.boxMesh = null
         this.boxMeshSize = 1.0
-        this.boxEnabled = true
+        this.boxEnabled = false
         this.lastBoxEnabled = null
         this.boxDisplacement = new THREE.Vector3(0,2,0)
 
         // room dimensions (shared between walls and floor)
-        this.roomSize = 20; // Tamanho da sala (comprimento e largura)
+        this.roomSize = 20;
 
         // plane related attributes
-        this.diffusePlaneColor = "#7294ca"
+        this.diffusePlaneColor = "#ecb86f"
         this.specularPlaneColor = "#777777"
         this.planeShininess = 30
         this.planeMaterial = new THREE.MeshPhongMaterial({ color: this.diffusePlaneColor, 
@@ -48,9 +49,11 @@ class MyContents  {
         // chair related attributes
         this.chairEnabled = true
         this.lastChairEnabled = null
-        this.chair = null
-        this.chairColor = 0x4A90E2 // New color: blue
-        this.chairRotation = 520 // 180 degrees in radians
+        this.chairs = [] // Now store multiple chairs
+        this.chairColor = 0xb17f39 
+        
+        // painting related attributes
+        this.paintingColor = 0xffff00 // Default yellow color for paintings
     }
 
     /**
@@ -79,15 +82,15 @@ class MyContents  {
         this.walls = [];
 
         const wallHeight = 8;
-        const wallLength = this.roomSize; // Usar o tamanho da sala
+        const wallLength = this.roomSize;
         const wallThickness = 0.3;
 
         // Wall positions: front, back, left, right
         const wallConfigs = [
-            { position: [0, wallHeight/2, wallLength/2], rotation: [0, 0, 0], size: [wallLength, wallHeight, wallThickness] }, // Front wall
-            { position: [0, wallHeight/2, -wallLength/2], rotation: [0, 0, 0], size: [wallLength, wallHeight, wallThickness] }, // Back wall
-            { position: [-wallLength/2, wallHeight/2, 0], rotation: [0, Math.PI/2, 0], size: [wallLength, wallHeight, wallThickness] }, // Left wall
-            { position: [wallLength/2, wallHeight/2, 0], rotation: [0, Math.PI/2, 0], size: [wallLength, wallHeight, wallThickness] }  // Right wall
+            { position: [0, wallHeight/2, wallLength/2], rotation: [0, 0, 0], size: [wallLength, wallHeight, wallThickness] },
+            { position: [0, wallHeight/2, -wallLength/2], rotation: [0, 0, 0], size: [wallLength, wallHeight, wallThickness] },
+            { position: [-wallLength/2, wallHeight/2, 0], rotation: [0, Math.PI/2, 0], size: [wallLength, wallHeight, wallThickness] },
+            { position: [wallLength/2, wallHeight/2, 0], rotation: [0, Math.PI/2, 0], size: [wallLength, wallHeight, wallThickness] }
         ];
 
         wallConfigs.forEach(config => {
@@ -121,43 +124,43 @@ class MyContents  {
     }
 
     /**
-     * builds the chair
+     * builds all chairs around the table
      */
-    buildChair() {
-        // Remove existing chair if it exists
-        if (this.chair !== undefined && this.chair !== null) {
-            this.app.scene.remove(this.chair);
-        }
+    buildChairs() {
+        // Remove existing chairs if they exist
+        this.chairs.forEach(chair => {
+            this.app.scene.remove(chair);
+        });
+        this.chairs = [];
 
-        // Create the chair with custom color and rotation
-        this.chair = new MyChair(this, this.chairColor, this.chairRotation);
-        
-        // Position the chair next to the table
-        this.chair.position.set(3, 0, 0); // 3 units to the right of the table
+        // Define chair positions and rotations around the table
+        const chairConfigs = [
+            { position: [1, 0, 2], rotation: -Math.PI/2 },    // Right side
+            { position: [1, 0, -2], rotation: -Math.PI/2 },    // Left side
+            { position: [-4, 0, 2], rotation: Math.PI/2 },          // Back side
+            { position: [-4, 0, -2], rotation: Math.PI/2 }    // Front side
+        ];
 
-        if (this.chairEnabled) {
-            this.app.scene.add(this.chair);
-        }
+        chairConfigs.forEach(config => {
+            const chair = new MyChair(this, this.chairColor, config.rotation);
+            chair.position.set(config.position[0], config.position[1], config.position[2]);
+            this.chairs.push(chair);
+            
+            if (this.chairEnabled) {
+                this.app.scene.add(chair);
+            }
+        });
     }
 
     /**
-     * updates the chair color
+     * updates the chair color for all chairs
      * @param {number} value - The new color in hexadecimal
      */
     updateChairColor(value) {
         this.chairColor = value
-        if (this.chair !== null) {
-            this.chair.updateColor(value)
-        }
-    }
-
-    /**
-     * updates the chair rotation
-     * @param {number} value - The rotation in radians
-     */
-    updateChairRotation(value) {
-        this.chairRotation = value
-        this.rebuildChair()
+        this.chairs.forEach(chair => {
+            chair.updateColor(value)
+        })
     }
 
     /**
@@ -194,29 +197,29 @@ class MyContents  {
         // Build walls
         this.buildWalls();
 
-        // Create and add table
+        // Create and add table (moved to the left)
         let table = new MyTable(this)
+        table.position.x = -1.5 // Move table 1.5 units to the left
         this.app.scene.add(table)
 
-        // Create and add chair
-        this.buildChair();
+        // Create and add chairs
+        this.buildChairs();
 
-        const painting = new MyPainting(this)
+        // Create paintings with custom color
+        const paintingMaterial = new THREE.MeshStandardMaterial({ color: this.paintingColor });
+        
+        const painting = new MyPainting(this, 0.3, 0.3, 0.15, paintingMaterial)
         painting.position.y += 5
         painting.position.x += 9.8
         painting.position.z += -4
-
         painting.rotation.y += Math.PI/2
-
         this.app.scene.add(painting)
 
-        const painting2 = new MyPainting(this)
+        const painting2 = new MyPainting(this, 0.3, 0.3, 0.15, paintingMaterial)
         painting2.position.y += 5
         painting2.position.x += 9.8
         painting2.position.z += 4
-
         painting2.rotation.y += Math.PI/2
-
         this.app.scene.add(painting2)
     }
     
@@ -268,10 +271,10 @@ class MyContents  {
     }
 
     /**
-     * rebuilds the chair
+     * rebuilds all chairs
      */
-    rebuildChair() {
-        this.buildChair();
+    rebuildChairs() {
+        this.buildChairs();
     }
     
     /**
@@ -310,18 +313,20 @@ class MyContents  {
     }
 
     /**
-     * updates the chair visibility if required
+     * updates the chairs visibility if required
      * this method is called from the render method of the app
      * updates are triggered by chairEnabled property changes
      */
-    updateChairIfRequired() {
+    updateChairsIfRequired() {
         if (this.chairEnabled !== this.lastChairEnabled) {
             this.lastChairEnabled = this.chairEnabled
-            if (this.chairEnabled) {
-                this.app.scene.add(this.chair)
-            } else {
-                this.app.scene.remove(this.chair)
-            }
+            this.chairs.forEach(chair => {
+                if (this.chairEnabled) {
+                    this.app.scene.add(chair)
+                } else {
+                    this.app.scene.remove(chair)
+                }
+            });
         }
     }
 
@@ -337,8 +342,8 @@ class MyContents  {
         // check if walls need to be updated
         this.updateWallsIfRequired()
 
-        // check if chair needs to be updated
-        this.updateChairIfRequired()
+        // check if chairs need to be updated
+        this.updateChairsIfRequired()
 
         // sets the box mesh position based on the displacement vector
         this.boxMesh.position.x = this.boxDisplacement.x

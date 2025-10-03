@@ -1,3 +1,4 @@
+
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { MyApp } from './MyApp.js';
 import { MyContents } from './MyContents.js';
@@ -41,7 +42,8 @@ class MyGuiInterface  {
         const data = {  
             'diffuse color': this.contents.diffusePlaneColor,
             'specular color': this.contents.specularPlaneColor,
-            'chair color': this.contents.chairColor
+            'chair color': this.contents.chairColor,
+            'painting color': this.contents.paintingColor
         };
 
         // adds a folder to the gui interface for the plane
@@ -60,8 +62,16 @@ class MyGuiInterface  {
         const chairFolder = this.datgui.addFolder( 'Chair' );
         chairFolder.add(this.contents, 'chairEnabled', true).name("enabled");
         chairFolder.addColor( data, 'chair color' ).onChange( (value) => { this.contents.updateChairColor(value) } );
-        chairFolder.add(this.contents, 'chairRotation', 0, 2 * Math.PI).name("rotation").onChange( (value) => { this.contents.updateChairRotation(value) } );
         chairFolder.open();
+
+        // adds a folder to the gui interface for paintings
+        const paintingFolder = this.datgui.addFolder( 'Paintings' );
+        paintingFolder.addColor( data, 'painting color' ).onChange( (value) => { 
+            this.contents.paintingColor = value;
+            // Note: To change painting colors dynamically, you'd need to store painting references
+            // and update their materials. For now, this will only affect new paintings.
+        } );
+        paintingFolder.open();
 
         // adds a folder to the gui interface for the camera
         const cameraFolder = this.datgui.addFolder('Camera')
