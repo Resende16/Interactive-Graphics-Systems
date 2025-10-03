@@ -1,3 +1,4 @@
+
 import * as THREE from 'three';
 
 export class MyTable extends THREE.Group {
@@ -15,11 +16,38 @@ export class MyTable extends THREE.Group {
         this.legRadius = 0.15
 
         // Materials
-        this.matTop = new THREE.MeshStandardMaterial({ color: 0xffffff })
-        this.matLeg = new THREE.MeshStandardMaterial({ color: 0xffffff })
+        this.matTop = new THREE.MeshStandardMaterial({ 
+            color: 0xffffff,
+            map: null // Para a textura de madeira
+        })
+        this.matLeg = new THREE.MeshStandardMaterial({ color: 0x8B4513 }) // Castanho para as pernas
 
-        this.makeTop();
-        this.makeLegs();
+        this.loadTextures();
+    }
+
+    loadTextures() {
+        const textureLoader = new THREE.TextureLoader();
+        
+        textureLoader.load(
+            './textures/tampomesa.jpg', 
+            (texture) => {
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat.set(2, 1); 
+                this.matTop.map = texture;
+                this.matTop.needsUpdate = true;
+                
+                this.makeTop();
+                this.makeLegs();
+            },
+            undefined,
+            (error) => {
+                console.error('Erro a carregar textura da mesa:', error);
+                // Fallback: constrói sem textura
+                this.makeTop();
+                this.makeLegs();
+            }
+        );
     }
 
     makeTop() {
@@ -29,8 +57,6 @@ export class MyTable extends THREE.Group {
         )
 
         top.position.y = this.legHeight
-        //top.castShadow = true
-        //top.receiveShadow = true
         this.add(top)
     }
 
@@ -53,8 +79,6 @@ export class MyTable extends THREE.Group {
       )
       
       leg.position.set(x, this.legHeight /2, z)
-      //leg.castShadow = true
-      //leg.receiveShadow = true
       return leg
     }
 }

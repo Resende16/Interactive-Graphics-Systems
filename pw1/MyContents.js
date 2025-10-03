@@ -49,11 +49,19 @@ class MyContents  {
         // chair related attributes
         this.chairEnabled = true
         this.lastChairEnabled = null
-        this.chairs = [] // Now store multiple chairs
+        this.chairs = []
         this.chairColor = 0xb17f39 
         
         // painting related attributes
-        this.paintingColor = 0xffff00 // Default yellow color for paintings
+        this.paintingColor = 0xffff00
+
+        // Caminhos das imagens locais da pasta textures
+        this.paintingImages = [
+            './textures/painting1.jpg',
+            './textures/painting2.jpg',
+            './textures/painting1.jpg',
+            './textures/painting2.jpg'
+        ]
     }
 
     /**
@@ -205,22 +213,50 @@ class MyContents  {
         // Create and add chairs
         this.buildChairs();
 
-        // Create paintings with custom color
-        const paintingMaterial = new THREE.MeshStandardMaterial({ color: this.paintingColor });
-        
-        const painting = new MyPainting(this, 0.3, 0.3, 0.15, paintingMaterial)
-        painting.position.y += 5
-        painting.position.x += 9.8
-        painting.position.z += -4
-        painting.rotation.y += Math.PI/2
-        this.app.scene.add(painting)
+        // Create paintings with imagens locais
+        const painting1 = new MyPainting(
+            this, 
+            0.3, 0.3, 0.15, 
+            this.paintingImages[0] // Primeira imagem
+        )
+        painting1.position.y += 5
+        painting1.position.x += 9.8
+        painting1.position.z += -4
+        painting1.rotation.y += Math.PI/2
+        this.app.scene.add(painting1)
 
-        const painting2 = new MyPainting(this, 0.3, 0.3, 0.15, paintingMaterial)
+        const painting2 = new MyPainting(
+            this, 
+            0.3, 0.3, 0.15, 
+            this.paintingImages[1] // Segunda imagem
+        )
         painting2.position.y += 5
         painting2.position.x += 9.8
         painting2.position.z += 4
         painting2.rotation.y += Math.PI/2
         this.app.scene.add(painting2)
+
+        const painting3 = new MyPainting(
+            this,
+            0.3, 0.3, 0.15,
+            this.paintingImages[2] // Terceira imagem 
+        )
+        painting3.position.y += 5
+        painting3.position.x += -9.8
+        painting3.position.z += -4
+        painting3.rotation.y += -Math.PI/2
+        this.app.scene.add(painting3)
+
+        const painting4 = new MyPainting(
+            this,
+            0.4, 0.5, 0.15,
+            this.paintingImages[3] // Quarta imagem 
+        )
+        painting4.position.y += 5
+        painting4.position.x += 4
+        painting4.position.z += -9.8
+        painting4.rotation.y += Math.PI
+        this.app.scene.add(painting4)
     }
     
     /**

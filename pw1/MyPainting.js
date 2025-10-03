@@ -1,7 +1,8 @@
+
 import * as THREE from 'three';
 
 export class MyPainting extends THREE.Group {
-    constructor(app, fw, fh, fd, mat, matFrame) {
+    constructor(app, fw, fh, fd, imagePath, matFrame) {
         super()
         this.app = app
 
@@ -17,11 +18,44 @@ export class MyPainting extends THREE.Group {
 
         // Materials
         let defaultMat = new THREE.MeshStandardMaterial({ color: 0xffffff })
-        this.mat = mat ?? defaultMat
-        this.matFrame = matFrame ?? defaultMat
+        this.mat = defaultMat // Será atualizado quando a imagem carregar
+        this.matFrame = matFrame ?? new THREE.MeshStandardMaterial({ color: 0x8B4513 }) // Madeira para a moldura
 
-        this.makePainting()
-        this.makeFrame()
+        this.imagePath = imagePath;
+        
+        this.loadPaintingTexture();
+    }
+
+    loadPaintingTexture() {
+        if (this.imagePath) {
+            const textureLoader = new THREE.TextureLoader();
+            textureLoader.load(
+                this.imagePath,
+                (texture) => {
+                    // Cria material com a textura da imagem
+                    this.mat = new THREE.MeshStandardMaterial({ 
+                        map: texture,
+                        side: THREE.DoubleSide
+                    });
+                    
+                    // Constrói o painting depois da textura carregar
+                    this.makePainting();
+                    this.makeFrame();
+                },
+                undefined,
+                (error) => {
+                    console.error('Erro a carregar imagem do painting:', error);
+                    // Fallback: usa cor sólida
+                    this.mat = new THREE.MeshStandardMaterial({ color: 0x3498db }); // Azul como fallback
+                    this.makePainting();
+                    this.makeFrame();
+                }
+            );
+        } else {
+            // Sem path, usa material padrão
+            this.makePainting();
+            this.makeFrame();
+        }
     }
 
     makePainting() {
@@ -53,9 +87,6 @@ export class MyPainting extends THREE.Group {
 
         const left = makeStrip(geoH, -this.w/2 - this.fw/2, 0, 0);
         const right = makeStrip(geoH, this.w/2 + this.fw/2, 0, 0);
-
-        
-
 
         this.add(left, right, top, bottom)
     }
