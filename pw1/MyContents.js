@@ -5,6 +5,7 @@ import { MyPainting } from './MyPainting.js';
 import { MyChair } from './MyChair.js';
 import { MyTVStand } from './MyTVStand.js';
 import { MyTelevision } from './MyTelevision.js';
+import { MySofa } from './MySofa.js';
 
 /**
  *  This class contains the contents of out application
@@ -76,6 +77,13 @@ class MyContents  {
 
         this.tvStand = null
         this.television = null
+
+        this.sofa = null
+        this.sofaEnabled = true
+        this.lastSofaEnabled = null
+        this.sofaColor = 0xeedcc4
+
+        this.cushionColor = 0xaedbea
 
     }
 
@@ -271,6 +279,8 @@ class MyContents  {
 
         this.createTVSet();
 
+        this.createSofa();
+
         // Create paintings with imagens locais
         const painting1 = new MyPainting(
             this, 
@@ -336,6 +346,24 @@ class MyContents  {
         this.app.scene.add(this.television);
     }
 
+    createSofa() {
+        // Criar sofá em L
+        this.sofa = new MySofa(this, this.sofaColor);
+        
+        // Posicionar no canto oposto à TV (canto inferior direito)
+        // A TV está em (-8.8, 0, 5) - canto superior esquerdo
+        // O sofá vai para o canto inferior direito
+        const roomHalfSize = this.roomSize / 2;
+        const offset = 1.5; // Pequeno offset da parede
+        
+        this.sofa.position.set(8, 0, 8.2); 
+        
+        // Rotacionar o sofá para ficar encostado nas duas paredes
+        this.sofa.rotation.y = Math.PI; // 180 graus para ficar virado para a sala
+        
+        this.app.scene.add(this.sofa);
+    }
+
     toggleTV() {
         this.tvOn = !this.tvOn;
         if (this.television) {
@@ -353,6 +381,40 @@ class MyContents  {
                 } else {
                     this.app.scene.remove(this.tvStand)
                     this.app.scene.remove(this.television)
+                }
+            }
+        }
+    }
+
+    /**
+     * Updates the sofa color
+     * @param {number} value - The new color in hexadecimal
+     */
+    updateSofaColor(value) {
+        this.sofaColor = value;
+        if (this.sofa) {
+            this.sofa.updateColor(value);
+        }
+    }
+
+    updateCushionColor(value) {
+        this.cushionColor = value;
+        if (this.sofa) {
+            this.sofa.updateCushionColor(value);
+        }
+    }
+
+    /**
+     * Updates sofa visibility if required
+     */
+    updateSofaIfRequired() {
+        if (this.sofaEnabled !== this.lastSofaEnabled) {
+            this.lastSofaEnabled = this.sofaEnabled;
+            if (this.sofa) {
+                if (this.sofaEnabled) {
+                    this.app.scene.add(this.sofa);
+                } else {
+                    this.app.scene.remove(this.sofa);
                 }
             }
         }
@@ -510,6 +572,8 @@ class MyContents  {
 
         // check if TV needs to be updated
         this.updateTVIfRequired()
+
+        this.updateSofaIfRequired()
 
         // sets the box mesh position based on the displacement vector
         this.boxMesh.position.x = this.boxDisplacement.x

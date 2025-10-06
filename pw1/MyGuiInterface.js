@@ -41,7 +41,9 @@ class MyGuiInterface  {
         const data = {  
             'diffuse color': this.contents.diffusePlaneColor,
             'chair color': this.contents.chairColor,
-            'painting color': this.contents.paintingColor
+            'painting color': this.contents.paintingColor,
+            'sofa color': this.contents.sofaColor,
+            'cushion color': this.contents.cushionColor
         };
 
         // adds a folder to the gui interface for the plane
@@ -92,6 +94,13 @@ class MyGuiInterface  {
             .onChange((value) => {
                 this.contents.tableGroup.position.z = value;
             });
+
+        const sofaFolder = this.datgui.addFolder( 'Sofa' );
+        sofaFolder.add(this.contents, 'sofaEnabled', true).name("enabled");
+        sofaFolder.addColor( data, 'sofa color' ).onChange( (value) => { this.contents.updateSofaColor(value) } );
+        sofaFolder.addColor( data, 'cushion color' ).onChange( (value) => { this.contents.updateCushionColor(value) } );
+        sofaFolder.open();
+
         
         // Opções para mover para cantos específicos
         const cornerOptions = {
