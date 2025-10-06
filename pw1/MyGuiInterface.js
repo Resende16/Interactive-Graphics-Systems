@@ -1,4 +1,3 @@
-
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { MyApp } from './MyApp.js';
 import { MyContents } from './MyContents.js';
@@ -41,16 +40,15 @@ class MyGuiInterface  {
         
         const data = {  
             'diffuse color': this.contents.diffusePlaneColor,
-            'specular color': this.contents.specularPlaneColor,
             'chair color': this.contents.chairColor,
             'painting color': this.contents.paintingColor
         };
 
         // adds a folder to the gui interface for the plane
-        const planeFolder = this.datgui.addFolder( 'Plane' );
+        const planeFolder = this.datgui.addFolder( 'Floor' );
         planeFolder.addColor( data, 'diffuse color' ).onChange( (value) => { this.contents.updateDiffusePlaneColor(value) } );
-        planeFolder.addColor( data, 'specular color' ).onChange( (value) => { this.contents.updateSpecularPlaneColor(value) } );
-        planeFolder.add(this.contents, 'planeShininess', 0, 1000).name("shininess").onChange( (value) => { this.contents.updatePlaneShininess(value) } );
+        planeFolder.add(this.contents.planeMaterial, 'roughness', 0, 1).name("roughness");
+        planeFolder.add(this.contents.planeMaterial, 'metalness', 0, 1).name("metalness");
         planeFolder.open();
 
         // adds a folder to the gui interface for the walls
@@ -64,14 +62,48 @@ class MyGuiInterface  {
         chairFolder.addColor( data, 'chair color' ).onChange( (value) => { this.contents.updateChairColor(value) } );
         chairFolder.open();
 
+        // adds a folder to the gui interface for the TV
+        const tvFolder = this.datgui.addFolder( 'Television' );
+        tvFolder.add(this.contents, 'tvEnabled', true).name("enabled");
+        tvFolder.add(this.contents, 'tvOn').name("TV On").onChange( (value) => { 
+            this.contents.tvOn = value;
+            if (this.contents.television) {
+                this.contents.television.toggleTV(value);
+            }
+        });
+        tvFolder.open();
+
         // adds a folder to the gui interface for paintings
         const paintingFolder = this.datgui.addFolder( 'Paintings' );
         paintingFolder.addColor( data, 'painting color' ).onChange( (value) => { 
             this.contents.paintingColor = value;
-            // Note: To change painting colors dynamically, you'd need to store painting references
-            // and update their materials. For now, this will only affect new paintings.
         } );
         paintingFolder.open();
+
+        // adds a folder to the gui interface for the table group
+        const tableGroupFolder = this.datgui.addFolder('Table Group');
+        tableGroupFolder.add(this.contents.tableGroupPosition, 'x', -this.contents.roomSize/2, this.contents.roomSize/2)
+            .name("position x")
+            .onChange((value) => {
+                this.contents.tableGroup.position.x = value;
+            });
+        tableGroupFolder.add(this.contents.tableGroupPosition, 'z', -this.contents.roomSize/2, this.contents.roomSize/2)
+            .name("position z")
+            .onChange((value) => {
+                this.contents.tableGroup.position.z = value;
+            });
+        
+        // Opções para mover para cantos específicos
+        const cornerOptions = {
+            corner: 'bottom-left'
+        };
+        tableGroupFolder.add(cornerOptions, 'corner', ['bottom-left', 'bottom-right', 'top-left', 'top-right'])
+            .name("move to corner")
+            .onChange((value) => {
+                this.contents.moveTableGroupToCorner(value);
+            });
+        
+        tableGroupFolder.open();
 
         // adds a folder to the gui interface for the camera
         const cameraFolder = this.datgui.addFolder('Camera')

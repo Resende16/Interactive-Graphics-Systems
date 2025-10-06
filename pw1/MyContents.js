@@ -1,9 +1,10 @@
-
 import * as THREE from 'three';
 import { MyAxis } from './MyAxis.js';
 import { MyTable } from './MyTable.js';
 import { MyPainting } from './MyPainting.js';
 import { MyChair } from './MyChair.js';
+import { MyTVStand } from './MyTVStand.js';
+import { MyTelevision } from './MyTelevision.js';
 
 /**
  *  This class contains the contents of out application
@@ -32,8 +33,11 @@ class MyContents  {
         this.diffusePlaneColor = "#ecb86f"
         this.specularPlaneColor = "#777777"
         this.planeShininess = 30
-        this.planeMaterial = new THREE.MeshPhongMaterial({ color: this.diffusePlaneColor, 
-            specular: this.specularPlaneColor, emissive: "#000000", shininess: this.planeShininess })
+        this.planeMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0xffffff,
+            roughness: 0.8,
+            metalness: 0.2
+        })
 
         // walls related attributes
         this.wallsEnabled = true
@@ -62,6 +66,17 @@ class MyContents  {
             './textures/painting1.jpg',
             './textures/painting2.jpg'
         ]
+
+        this.tableGroup = null
+        this.tableGroupPosition = { x: -1.5, y: 0, z: 0 } // Posição inicial do grupo
+
+        this.tvEnabled = true
+        this.lastTvEnabled = null
+        this.tvOn = false
+
+        this.tvStand = null
+        this.television = null
+
     }
 
     /**
@@ -115,7 +130,7 @@ class MyContents  {
     }
 
     /**
-     * builds the floor plane
+     * builds the floor plane with texture
      */
     buildFloor() {
         // Remove existing floor if it exists
@@ -128,7 +143,42 @@ class MyContents  {
         this.planeMesh = new THREE.Mesh(plane, this.planeMaterial);
         this.planeMesh.rotation.x = -Math.PI / 2;
         this.planeMesh.position.y = 0;
+        
+        // Load floor texture
+        this.loadFloorTexture();
+        
         this.app.scene.add(this.planeMesh);
+    }
+
+    /**
+     * Loads and applies the floor texture
+     */
+    loadFloorTexture() {
+        const textureLoader = new THREE.TextureLoader();
+        textureLoader.load(
+            './textures/floor.png', // Caminho para a sua textura PNG
+            (texture) => {
+                // Configurar a textura para repetir
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                
+                // Definir repetição da textura (ajuste conforme necessário)
+                const repeatCount = 4; // Quantas vezes a textura se repete
+                texture.repeat.set(repeatCount, repeatCount);
+                
+                // Aplicar a textura ao material
+                this.planeMaterial.map = texture;
+                this.planeMaterial.needsUpdate = true;
+                
+                console.log('Textura do chão carregada com sucesso!');
+            },
+            undefined,
+            (error) => {
+                console.error('Erro ao carregar textura do chão:', error);
+                // Fallback: usar cor sólida
+                this.planeMaterial.color.set(this.diffusePlaneColor);
+            }
+        );
     }
 
     /**
@@ -137,16 +187,16 @@ class MyContents  {
     buildChairs() {
         // Remove existing chairs if they exist
         this.chairs.forEach(chair => {
-            this.app.scene.remove(chair);
+            this.tableGroup.remove(chair);
         });
         this.chairs = [];
 
         // Define chair positions and rotations around the table
         const chairConfigs = [
-            { position: [1, 0, 2], rotation: -Math.PI/2 },    // Right side
-            { position: [1, 0, -2], rotation: -Math.PI/2 },    // Left side
-            { position: [-4, 0, 2], rotation: Math.PI/2 },          // Back side
-            { position: [-4, 0, -2], rotation: Math.PI/2 }    // Front side
+            { position: [3, 0, 2], rotation: -Math.PI/2 },    // Right side
+            { position: [3, 0, -2], rotation: -Math.PI/2 },    // Left side
+            { position: [-3, 0, 2], rotation: Math.PI/2 },          // Back side
+            { position: [-3, 0, -2], rotation: Math.PI/2 }    // Front side
         ];
 
         chairConfigs.forEach(config => {
@@ -155,7 +205,7 @@ class MyContents  {
             this.chairs.push(chair);
             
             if (this.chairEnabled) {
-                this.app.scene.add(chair);
+                this.tableGroup.add(chair);
             }
         });
     }
@@ -206,12 +256,20 @@ class MyContents  {
         this.buildWalls();
 
         // Create and add table (moved to the left)
+        this.tableGroup = new THREE.Group();
+        this.tableGroup.position.set(this.tableGroupPosition.x, this.tableGroupPosition.y, this.tableGroupPosition.z);
+        this.app.scene.add(this.tableGroup);
+
+        // Create and add table ao grupo
         let table = new MyTable(this)
-        table.position.x = -1.5 // Move table 1.5 units to the left
-        this.app.scene.add(table)
+        this.tableGroup.add(table)
 
         // Create and add chairs
         this.buildChairs();
+
+        this.moveTableGroupToCorner('bottom-left');
+
+        this.createTVSet();
 
         // Create paintings with imagens locais
         const painting1 = new MyPainting(
@@ -258,6 +316,47 @@ class MyContents  {
         painting4.rotation.y += Math.PI
         this.app.scene.add(painting4)
     }
+
+    createTVSet() {
+        // Create TV stand
+        this.tvStand = new MyTVStand(this);
+        this.tvStand.rotation.y = Math.PI/2
+        this.tvStand.position.set(-8.8, 0, 5); // Posição do móvel da TV
+        this.app.scene.add(this.tvStand);
+
+        // Create television
+        this.television = new MyTelevision(this);
+        // Posiciona a TV em cima do móvel
+        this.television.position.set(
+            this.tvStand.position.x,
+            this.tvStand.position.y + 1.7, // Altura do móvel + margem
+            this.tvStand.position.z
+        );
+        this.television.rotation.y = Math.PI/2
+        this.app.scene.add(this.television);
+    }
+
+    toggleTV() {
+        this.tvOn = !this.tvOn;
+        if (this.television) {
+            this.television.toggleTV(this.tvOn);
+        }
+    }
+
+    updateTVIfRequired() {
+        if (this.tvEnabled !== this.lastTvEnabled) {
+            this.lastTvEnabled = this.tvEnabled
+            if (this.tvStand) {
+                if (this.tvEnabled) {
+                    this.app.scene.add(this.tvStand)
+                    this.app.scene.add(this.television)
+                } else {
+                    this.app.scene.remove(this.tvStand)
+                    this.app.scene.remove(this.television)
+                }
+            }
+        }
+    }
     
     /**
      * updates the diffuse plane color and the material
@@ -274,7 +373,7 @@ class MyContents  {
      */
     updateSpecularPlaneColor(value) {
         this.specularPlaneColor = value
-        this.planeMaterial.specular.set(this.specularPlaneColor)
+        // Not used with MeshStandardMaterial
     }
     
     /**
@@ -283,7 +382,7 @@ class MyContents  {
      */
     updatePlaneShininess(value) {
         this.planeShininess = value
-        this.planeMaterial.shininess = this.planeShininess
+        // Not used with MeshStandardMaterial
     }
     
     /**
@@ -348,6 +447,34 @@ class MyContents  {
         }
     }
 
+    moveTableGroupToCorner(corner = 'bottom-left') {
+        const roomHalfSize = this.roomSize / 2;
+        const offset = 7; 
+        
+        switch(corner) {
+            case 'bottom-left':
+                this.tableGroup.position.set(-roomHalfSize + offset, 0, -roomHalfSize + offset);
+                break;
+            case 'bottom-right':
+                this.tableGroup.position.set(roomHalfSize - offset, 0, -roomHalfSize + offset);
+                break;
+            case 'top-left':
+                this.tableGroup.position.set(-roomHalfSize + offset, 0, roomHalfSize - offset);
+                break;
+            case 'top-right':
+                this.tableGroup.position.set(roomHalfSize - offset, 0, roomHalfSize - offset);
+                break;
+            default:
+                this.tableGroup.position.set(-roomHalfSize + offset, 0, -roomHalfSize + offset);
+        }
+        
+        this.tableGroupPosition = {
+            x: this.tableGroup.position.x,
+            y: this.tableGroup.position.y,
+            z: this.tableGroup.position.z
+        };
+    }
+
     /**
      * updates the chairs visibility if required
      * this method is called from the render method of the app
@@ -358,9 +485,9 @@ class MyContents  {
             this.lastChairEnabled = this.chairEnabled
             this.chairs.forEach(chair => {
                 if (this.chairEnabled) {
-                    this.app.scene.add(chair)
+                    this.tableGroup.add(chair)
                 } else {
-                    this.app.scene.remove(chair)
+                    this.tableGroup.remove(chair)
                 }
             });
         }
@@ -380,6 +507,9 @@ class MyContents  {
 
         // check if chairs need to be updated
         this.updateChairsIfRequired()
+
+        // check if TV needs to be updated
+        this.updateTVIfRequired()
 
         // sets the box mesh position based on the displacement vector
         this.boxMesh.position.x = this.boxDisplacement.x
