@@ -70,10 +70,10 @@ class MyContents {
         this.paintingColor = 0xffff00
 
         this.paintingImages = [
-            './textures/painting1.jpg',
-            './textures/painting2.jpg',
-            './textures/painting1.jpg',
-            './textures/painting2.jpg'
+            './textures/selfie2.jpeg',
+            './textures/selfie2.jpeg',
+            './textures/selfie2.jpeg',
+            './textures/selfie2.jpeg'
         ]
 
         this.tableGroup = null
