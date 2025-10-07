@@ -72,12 +72,13 @@ class MyContents {
         this.paintingImages = [
             './textures/selfie2.jpeg',
             './textures/selfie2.jpeg',
-            './textures/selfie2.jpeg',
+            './textures/monalisa.jpg',
             './textures/selfie2.jpeg'
         ]
 
         this.tableGroup = null
         this.tableGroupPosition = { x: -1.5, y: 0, z: 0 } // Posição inicial do grupo
+
 
         this.tvEnabled = true
         this.lastTvEnabled = null
@@ -102,9 +103,9 @@ class MyContents {
         this.carpetEnabled = true
         this.lastCarpetEnabled = null
         this.carpetMesh = null
-        this.carpetWidth = 6
-        this.carpetDepth = 9
-        this.carpetHeight = 0.01
+        this.carpetWidth = 7
+        this.carpetDepth = 10
+        this.carpetHeight = 0.02
         this.carpetColor = 0xf4eee6
 
         // baseboard related attributes
@@ -526,6 +527,7 @@ class MyContents {
         if (this.carpetMesh) {
             this.carpetMesh.position.copy(this.tableGroup.position);
             this.carpetMesh.position.y = this.carpetHeight / 2 + 0.01;
+            this.carpetMesh.position.x = 5
         }
     }
 
@@ -589,6 +591,7 @@ class MyContents {
         let table = new MyTable(this)
         this.tableGroup.add(table)
 
+
         // Create bowl with oranges on the table
         this.createBowlWithOranges();
 
@@ -608,6 +611,16 @@ class MyContents {
         this.createSofa();
         this.buildLamp();
 
+        const painting1 = new MyPainting(
+            this,
+            0.3, 0.3, 0.15,
+            this.paintingImages[0] // Segunda imagem
+        )
+        painting1.position.y += 5
+        painting1.position.x += 9.8
+        painting1.position.z += -4
+        painting1.rotation.y += Math.PI / 2
+        this.app.scene.add(painting1)
 
         const painting2 = new MyPainting(
             this,
@@ -627,27 +640,18 @@ class MyContents {
         )
         painting3.position.y += 5
         painting3.position.x += -9.8
-        painting3.position.z += -4
+        painting3.position.z += -6
         painting3.rotation.y += -Math.PI / 2
         this.app.scene.add(painting3)
 
-        const painting4 = new MyPainting(
-            this,
-            0.4, 0.5, 0.15,
-            this.paintingImages[3] // Quarta imagem 
-        )
-        painting4.position.y += 5
-        painting4.position.x += 4
-        painting4.position.z += -9.8
-        painting4.rotation.y += Math.PI
-        this.app.scene.add(painting4)
+        
     }
 
     createTVSet() {
         // Create TV stand
         this.tvStand = new MyTVStand(this);
         this.tvStand.rotation.y = Math.PI / 2
-        this.tvStand.position.set(-8.8, 0, 5); // Posição do móvel da TV
+        this.tvStand.position.set(-8.8, 0, 0); // Posição do móvel da TV
         this.app.scene.add(this.tvStand);
 
         // Create television
@@ -669,9 +673,9 @@ class MyContents {
         const roomHalfSize = this.roomSize / 2;
         const offset = 1.5;
 
-        this.sofa.position.set(8, 0, 8.2);
+        this.sofa.position.set(-3, 0, -5);
 
-        this.sofa.rotation.y = Math.PI;
+        this.sofa.rotation.y = -Math.PI/2;
 
         this.app.scene.add(this.sofa);
     }
@@ -843,7 +847,7 @@ class MyContents {
         }
 
         this.tableGroupPosition = {
-            x: this.tableGroup.position.x,
+            x: this.tableGroup.position.x = 5,
             y: this.tableGroup.position.y,
             z: this.tableGroup.position.z
         };
