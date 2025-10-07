@@ -5,7 +5,7 @@ import { MyContents } from './MyContents.js';
 /**
     This class customizes the gui interface for the app
 */
-class MyGuiInterface  {
+class MyGuiInterface {
 
     /**
      * 
@@ -13,7 +13,7 @@ class MyGuiInterface  {
      */
     constructor(app) {
         this.app = app
-        this.datgui =  new GUI();
+        this.datgui = new GUI();
         this.contents = null
     }
 
@@ -30,8 +30,8 @@ class MyGuiInterface  {
      */
     init() {
         // add a folder to the gui interface for the box
-        
-        const data = {  
+
+        const data = {
             'diffuse color': this.contents.diffusePlaneColor,
             'chair color': this.contents.chairColor,
             'painting color': this.contents.paintingColor,
@@ -40,54 +40,54 @@ class MyGuiInterface  {
         };
 
         // adds a folder to the gui interface for the plane
-        const planeFolder = this.datgui.addFolder( 'Floor' );
-        planeFolder.addColor( data, 'diffuse color' ).onChange( (value) => { this.contents.updateDiffusePlaneColor(value) } );
+        const planeFolder = this.datgui.addFolder('Floor');
+        planeFolder.addColor(data, 'diffuse color').onChange((value) => { this.contents.updateDiffusePlaneColor(value) });
         planeFolder.add(this.contents.planeMaterial, 'roughness', 0, 1).name("roughness");
         planeFolder.add(this.contents.planeMaterial, 'metalness', 0, 1).name("metalness");
         planeFolder.open();
 
         // adds a folder to the gui interface for the walls
-        const wallsFolder = this.datgui.addFolder( 'Walls' );
+        const wallsFolder = this.datgui.addFolder('Walls');
         wallsFolder.add(this.contents, 'wallsEnabled', true).name("enabled");
         wallsFolder.open();
 
         // adds a folder to the gui interface for the chair
-        const chairFolder = this.datgui.addFolder( 'Chair' );
+        const chairFolder = this.datgui.addFolder('Chair');
         chairFolder.add(this.contents, 'chairEnabled', true).name("enabled");
-        chairFolder.addColor( data, 'chair color' ).onChange( (value) => { this.contents.updateChairColor(value) } );
+        chairFolder.addColor(data, 'chair color').onChange((value) => { this.contents.updateChairColor(value) });
         chairFolder.open();
 
         // adds a folder to the gui interface for the TV
-        const tvFolder = this.datgui.addFolder( 'Television' );
+        const tvFolder = this.datgui.addFolder('Television');
         tvFolder.add(this.contents, 'tvEnabled', true).name("enabled");
-        tvFolder.add(this.contents, 'tvOn').name("TV On").onChange( (value) => { 
+        tvFolder.add(this.contents, 'tvOn').name("TV On").onChange((value) => {
             this.contents.tvOn = value;
             if (this.contents.television) {
                 this.contents.television.toggleTV(value);
             }
         });
-        tvFolder.open();        
+        tvFolder.open();
 
         // adds a folder to the gui interface for the table group
         const tableGroupFolder = this.datgui.addFolder('Table Group');
-        tableGroupFolder.add(this.contents.tableGroupPosition, 'x', -this.contents.roomSize/2, this.contents.roomSize/2)
+        tableGroupFolder.add(this.contents.tableGroupPosition, 'x', -this.contents.roomSize / 2, this.contents.roomSize / 2)
             .name("position x")
             .onChange((value) => {
                 this.contents.tableGroup.position.x = value;
             });
-        tableGroupFolder.add(this.contents.tableGroupPosition, 'z', -this.contents.roomSize/2, this.contents.roomSize/2)
+        tableGroupFolder.add(this.contents.tableGroupPosition, 'z', -this.contents.roomSize / 2, this.contents.roomSize / 2)
             .name("position z")
             .onChange((value) => {
                 this.contents.tableGroup.position.z = value;
             });
 
-        const sofaFolder = this.datgui.addFolder( 'Sofa' );
+        const sofaFolder = this.datgui.addFolder('Sofa');
         sofaFolder.add(this.contents, 'sofaEnabled', true).name("enabled");
-        sofaFolder.addColor( data, 'sofa color' ).onChange( (value) => { this.contents.updateSofaColor(value) } );
-        sofaFolder.addColor( data, 'cushion color' ).onChange( (value) => { this.contents.updateCushionColor(value) } );
+        sofaFolder.addColor(data, 'sofa color').onChange((value) => { this.contents.updateSofaColor(value) });
+        sofaFolder.addColor(data, 'cushion color').onChange((value) => { this.contents.updateCushionColor(value) });
         sofaFolder.open();
 
-        
+
         // Opções para mover para cantos específicos
         const cornerOptions = {
             corner: 'bottom-left'
@@ -97,12 +97,12 @@ class MyGuiInterface  {
             .onChange((value) => {
                 this.contents.moveTableGroupToCorner(value);
             });
-        
+
         tableGroupFolder.open();
 
         // adds a folder to the gui interface for the camera
         const cameraFolder = this.datgui.addFolder('Camera')
-        cameraFolder.add(this.app, 'activeCameraName', [ 'Perspective', 'Perspective2', 'Left', 'Top', 'Front','Right','Back'] ).name("active camera");
+        cameraFolder.add(this.app, 'activeCameraName', ['Perspective', 'Perspective2', 'Left', 'Top', 'Front', 'Right', 'Back']).name("active camera");
         cameraFolder.add(this.app.activeCamera.position, 'x', 0, 10).name("x coord")
         cameraFolder.open()
 
@@ -143,10 +143,33 @@ class MyGuiInterface  {
             }
         });
         lightFolder.open();
-    }
-    
 
-    
+
+
+        const lampFolder = this.datgui.addFolder('Lamp');
+        const lampParams = {
+            type: this.contents.lampType,
+            color: this.contents.lampColor,
+            intensity: this.contents.lampIntensity
+        };
+
+        lampFolder.add(lampParams, 'type', ['Point', 'Spot']).name('Type').onChange(val => {
+            this.contents.lampType = val;
+            this.contents.updateLamp();
+        });
+        lampFolder.addColor(lampParams, 'color').name('Color').onChange(val => {
+            this.contents.lampColor = val;
+            if (this.contents.lamp) this.contents.lamp.setColor(val);
+        });
+        lampFolder.add(lampParams, 'intensity', 0, 20).name('Intensity').onChange(val => {
+            this.contents.lampIntensity = val;
+            if (this.contents.lamp) this.contents.lamp.light.intensity = val;
+        });
+        lampFolder.open();
+
+    }
+
+
 }
 
 export { MyGuiInterface };

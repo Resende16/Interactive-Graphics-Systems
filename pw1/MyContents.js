@@ -7,16 +7,16 @@ import { MyTVStand } from './MyTVStand.js';
 import { MyTelevision } from './MyTelevision.js';
 import { MySofa } from './MySofa.js';
 import { MySphere } from './MySphere.js';
-
+import { MyLamp } from './Mylamp.js';
 /**
  *  This class contains the contents of out application
  */
-class MyContents  {
+class MyContents {
 
     /**
        constructs the object
        @param {MyApp} app The application object
-    */ 
+    */
     constructor(app) {
         this.app = app
         this.axis = null
@@ -26,7 +26,7 @@ class MyContents  {
         this.boxMeshSize = 1.0
         this.boxEnabled = false
         this.lastBoxEnabled = null
-        this.boxDisplacement = new THREE.Vector3(0,2,0)
+        this.boxDisplacement = new THREE.Vector3(0, 2, 0)
 
         // room dimensions (shared between walls and floor)
         this.roomSize = 20;
@@ -35,21 +35,22 @@ class MyContents  {
         this.diffusePlaneColor = "#ecb86f"
         this.specularPlaneColor = "#777777"
         this.planeShininess = 30
-        this.planeMaterial = new THREE.MeshStandardMaterial({ 
+        this.planeMaterial = new THREE.MeshStandardMaterial({
             color: 0xffffff,
             roughness: 0.8,
             metalness: 0.2
         })
 
         // walls related attributes
+        this.wallHeight = 8
         this.wallsEnabled = true
         this.lastWallsEnabled = null
         this.walls = []
-        this.wallMaterial = new THREE.MeshPhongMaterial({ 
-            color: "#cdaa90ff", 
-            specular: "#333333", 
-            emissive: "#000000", 
-            shininess: 30 
+        this.wallMaterial = new THREE.MeshPhongMaterial({
+            color: "#cdaa90ff",
+            specular: "#333333",
+            emissive: "#000000",
+            shininess: 30
         })
 
         // chair related attributes
@@ -62,9 +63,9 @@ class MyContents  {
         this.bowlAndOrangesEnabled = true
         this.lastBowlAndOrangesEnabled = null
         this.bowlAndOrangesGroup = null
-        this.bowlColor = 0xf4eee6  
-        this.orangeColor = 0xff8c00 
-        
+        this.bowlColor = 0xf4eee6
+        this.orangeColor = 0xff8c00
+
         // painting related attributes
         this.paintingColor = 0xffff00
 
@@ -92,6 +93,11 @@ class MyContents  {
 
         this.cushionColor = 0xaedbea
 
+
+        //Lamp atributes;
+        this.lampType = 'Point';
+        this.lampColor = "#ffff00";
+        this.lampIntensity = 5;
         // carpet related attributes
         this.carpetEnabled = true
         this.lastCarpetEnabled = null
@@ -113,16 +119,18 @@ class MyContents  {
     /**
      * builds the box mesh with material assigned
      */
-    buildBox() {    
-        let boxMaterial = new THREE.MeshPhongMaterial({ color: "#ffff77", 
-        specular: "#000000", emissive: "#000000", shininess: 90 })
+    buildBox() {
+        let boxMaterial = new THREE.MeshPhongMaterial({
+            color: "#ffff77",
+            specular: "#000000", emissive: "#000000", shininess: 90
+        })
 
         // Create a Cube Mesh with basic material
-        let box = new THREE.BoxGeometry(  this.boxMeshSize,  this.boxMeshSize,  this.boxMeshSize );
-        this.boxMesh = new THREE.Mesh( box, boxMaterial );
+        let box = new THREE.BoxGeometry(this.boxMeshSize, this.boxMeshSize, this.boxMeshSize);
+        this.boxMesh = new THREE.Mesh(box, boxMaterial);
         this.boxMesh.position.y = this.boxDisplacement.y;
         this.boxMesh.rotation.x = Math.PI / 6;
-        this.boxMesh.scale.set(3,2,1);
+        this.boxMesh.scale.set(3, 2, 1);
     }
 
     /**
@@ -135,16 +143,16 @@ class MyContents  {
         });
         this.walls = [];
 
-        const wallHeight = 8;
+        const wallHeight = this.wallHeight;
         const wallLength = this.roomSize;
         const wallThickness = 0.3;
 
         // Wall positions: front, back, left, right
         const wallConfigs = [
-            { position: [0, wallHeight/2, wallLength/2], rotation: [0, 0, 0], size: [wallLength, wallHeight, wallThickness] },
-            { position: [0, wallHeight/2, -wallLength/2], rotation: [0, 0, 0], size: [wallLength, wallHeight, wallThickness] },
-            { position: [-wallLength/2, wallHeight/2, 0], rotation: [0, Math.PI/2, 0], size: [wallLength, wallHeight, wallThickness] },
-            { position: [wallLength/2, wallHeight/2, 0], rotation: [0, Math.PI/2, 0], size: [wallLength, wallHeight, wallThickness] }
+            { position: [0, wallHeight / 2, wallLength / 2], rotation: [0, 0, 0], size: [wallLength, wallHeight, wallThickness] },
+            { position: [0, wallHeight / 2, -wallLength / 2], rotation: [0, 0, 0], size: [wallLength, wallHeight, wallThickness] },
+            { position: [-wallLength / 2, wallHeight / 2, 0], rotation: [0, Math.PI / 2, 0], size: [wallLength, wallHeight, wallThickness] },
+            { position: [wallLength / 2, wallHeight / 2, 0], rotation: [0, Math.PI / 2, 0], size: [wallLength, wallHeight, wallThickness] }
         ];
 
         wallConfigs.forEach(config => {
@@ -152,13 +160,38 @@ class MyContents  {
             const wallMesh = new THREE.Mesh(wallGeometry, this.wallMaterial);
             wallMesh.position.set(...config.position);
             wallMesh.rotation.set(...config.rotation);
-            
+
             this.walls.push(wallMesh);
             if (this.wallsEnabled) {
                 this.app.scene.add(wallMesh);
             }
         });
     }
+
+     buildLamp() {
+        const lampPosition = new THREE.Vector3(0, this.wallHeight * 0.8, 0);
+
+        if (this.lamp) {
+            if (this.app.scene.children.includes(this.lamp)) {
+                this.app.scene.remove(this.lamp);
+            }
+            if (this.tableGroup && this.tableGroup.children.includes(this.lamp)) {
+                this.tableGroup.remove(this.lamp);
+            }
+            this.lamp = null;
+        }
+
+        const isPointLight = this.lampType === 'Point';
+        this.lamp = new MyLamp(this.lampColor,lampPosition, 0.5, this.wallHeight, isPointLight);
+
+        this.lamp.setColor(this.lampColor);
+        this.lamp.light.intensity = this.lampIntensity;
+
+        if (this.tableGroup) {
+            this.tableGroup.add(this.lamp);
+        }
+    }
+
 
     /**
      * builds the floor plane with texture
@@ -174,10 +207,10 @@ class MyContents  {
         this.planeMesh = new THREE.Mesh(plane, this.planeMaterial);
         this.planeMesh.rotation.x = -Math.PI / 2;
         this.planeMesh.position.y = 0;
-        
+
         // Load floor texture
         this.loadFloorTexture();
-        
+
         this.app.scene.add(this.planeMesh);
     }
 
@@ -187,18 +220,18 @@ class MyContents  {
     loadFloorTexture() {
         const textureLoader = new THREE.TextureLoader();
         textureLoader.load(
-            './textures/floor.png', 
+            './textures/floor.png',
             (texture) => {
                 texture.wrapS = THREE.RepeatWrapping;
                 texture.wrapT = THREE.RepeatWrapping;
-                
+
                 const repeatCount = 4; // Quantas vezes a textura se repete
                 texture.repeat.set(repeatCount, repeatCount);
-                
+
                 // Aplicar a textura ao material
                 this.planeMaterial.map = texture;
                 this.planeMaterial.needsUpdate = true;
-                
+
                 console.log('Textura do chão carregada com sucesso!');
             },
             undefined,
@@ -220,12 +253,12 @@ class MyContents  {
 
         // Create a group for bowl and oranges
         this.bowlAndOrangesGroup = new THREE.Group();
-        
+
         // Create the bowl (half sphere)
         const bowl = new MySphere(this, 0.8, this.bowlColor, 32, true);
         bowl.position.y = 0.5; // Adjust height to sit on table
         bowl.rotation.x = Math.PI
-        
+
         // Create oranges (small spheres)
         const orangePositions = [
             { x: -0.3, y: 0.2, z: 0.2 },
@@ -240,10 +273,10 @@ class MyContents  {
         });
 
         this.bowlAndOrangesGroup.add(bowl);
-        
+
         // Position the bowl group on the table
         this.bowlAndOrangesGroup.position.y = 3.5; // Height of table + bowl base
-        
+
         if (this.bowlAndOrangesEnabled) {
             this.tableGroup.add(this.bowlAndOrangesGroup);
         }
@@ -261,17 +294,17 @@ class MyContents  {
 
         // Define chair positions and rotations around the table
         const chairConfigs = [
-            { position: [3, 0, 2], rotation: -Math.PI/2 },    // Right side
-            { position: [3, 0, -2], rotation: -Math.PI/2 },    // Left side
-            { position: [-3, 0, 2], rotation: Math.PI/2 },          // Back side
-            { position: [-3, 0, -2], rotation: Math.PI/2 }    // Front side
+            { position: [3, 0, 2], rotation: -Math.PI / 2 },    // Right side
+            { position: [3, 0, -2], rotation: -Math.PI / 2 },    // Left side
+            { position: [-3, 0, 2], rotation: Math.PI / 2 },          // Back side
+            { position: [-3, 0, -2], rotation: Math.PI / 2 }    // Front side
         ];
 
         chairConfigs.forEach(config => {
             const chair = new MyChair(this, this.chairColor, config.rotation);
             chair.position.set(config.position[0], config.position[1], config.position[2]);
             this.chairs.push(chair);
-            
+
             if (this.chairEnabled) {
                 this.tableGroup.add(chair);
             }
@@ -315,7 +348,7 @@ class MyContents  {
         }
 
         // Create carpet material with texture
-        this.carpetMaterial = new THREE.MeshStandardMaterial({ 
+        this.carpetMaterial = new THREE.MeshStandardMaterial({
             color: this.carpetColor,
             roughness: 0.9,
             metalness: 0.1
@@ -327,11 +360,11 @@ class MyContents  {
         // Create carpet geometry
         const carpetGeometry = new THREE.BoxGeometry(this.carpetWidth, this.carpetHeight, this.carpetDepth);
         this.carpetMesh = new THREE.Mesh(carpetGeometry, this.carpetMaterial);
-        
+
         // Position carpet under the table group
         this.carpetMesh.position.copy(this.tableGroup.position);
         this.carpetMesh.position.y = this.carpetHeight / 2 + 0.01; // Slightly above floor
-        
+
         if (this.carpetEnabled) {
             this.app.scene.add(this.carpetMesh);
         }
@@ -343,18 +376,18 @@ class MyContents  {
     loadCarpetTexture() {
         const textureLoader = new THREE.TextureLoader();
         textureLoader.load(
-            './textures/carpete.jpg', 
+            './textures/carpete.jpg',
             (texture) => {
                 texture.wrapS = THREE.RepeatWrapping;
                 texture.wrapT = THREE.RepeatWrapping;
-                
+
                 const repeatX = this.carpetWidth / 2;
                 const repeatY = this.carpetDepth / 2;
                 texture.repeat.set(repeatX, repeatY);
-                
+
                 this.carpetMaterial.map = texture;
                 this.carpetMaterial.needsUpdate = true;
-                
+
                 console.log('Textura da carpete carregada com sucesso!');
             },
             undefined,
@@ -381,30 +414,30 @@ class MyContents  {
 
         // Baseboard positions: front, back, left, right
         const baseboardConfigs = [
-            { 
-                position: [0, baseboardHeight/2, wallLength/2 - baseboardDepth/2], 
-                rotation: [0, 0, 0], 
-                size: [wallLength, baseboardHeight, baseboardDepth] 
+            {
+                position: [0, baseboardHeight / 2, wallLength / 2 - baseboardDepth / 2],
+                rotation: [0, 0, 0],
+                size: [wallLength, baseboardHeight, baseboardDepth]
             },
-            { 
-                position: [0, baseboardHeight/2, -wallLength/2 + baseboardDepth/2], 
-                rotation: [0, 0, 0], 
-                size: [wallLength, baseboardHeight, baseboardDepth] 
+            {
+                position: [0, baseboardHeight / 2, -wallLength / 2 + baseboardDepth / 2],
+                rotation: [0, 0, 0],
+                size: [wallLength, baseboardHeight, baseboardDepth]
             },
-            { 
-                position: [-wallLength/2 + baseboardDepth/2, baseboardHeight/2, 0], 
-                rotation: [0, Math.PI/2, 0], 
-                size: [wallLength, baseboardHeight, baseboardDepth] 
+            {
+                position: [-wallLength / 2 + baseboardDepth / 2, baseboardHeight / 2, 0],
+                rotation: [0, Math.PI / 2, 0],
+                size: [wallLength, baseboardHeight, baseboardDepth]
             },
-            { 
-                position: [wallLength/2 - baseboardDepth/2, baseboardHeight/2, 0], 
-                rotation: [0, Math.PI/2, 0], 
-                size: [wallLength, baseboardHeight, baseboardDepth] 
+            {
+                position: [wallLength / 2 - baseboardDepth / 2, baseboardHeight / 2, 0],
+                rotation: [0, Math.PI / 2, 0],
+                size: [wallLength, baseboardHeight, baseboardDepth]
             }
         ];
 
         // Create wood material for baseboards
-        this.baseboardMaterial = new THREE.MeshStandardMaterial({ 
+        this.baseboardMaterial = new THREE.MeshStandardMaterial({
             color: 0x8B4513, // Brown wood color
             roughness: 0.7,
             metalness: 0.3
@@ -418,7 +451,7 @@ class MyContents  {
             const baseboardMesh = new THREE.Mesh(baseboardGeometry, this.baseboardMaterial);
             baseboardMesh.position.set(...config.position);
             baseboardMesh.rotation.set(...config.rotation);
-            
+
             this.baseboards.push(baseboardMesh);
             if (this.baseboardEnabled) {
                 this.app.scene.add(baseboardMesh);
@@ -432,17 +465,17 @@ class MyContents  {
     loadBaseboardTexture() {
         const textureLoader = new THREE.TextureLoader();
         textureLoader.load(
-            './textures/tampomesa.jpg', 
+            './textures/tampomesa.jpg',
             (texture) => {
                 texture.wrapS = THREE.RepeatWrapping;
                 texture.wrapT = THREE.RepeatWrapping;
-                
-                const repeatCount = 8; 
+
+                const repeatCount = 8;
                 texture.repeat.set(repeatCount, 1);
-                
+
                 this.baseboardMaterial.map = texture;
                 this.baseboardMaterial.needsUpdate = true;
-                
+
                 console.log('Textura do rodapé carregada com sucesso!');
             },
             undefined,
@@ -496,11 +529,15 @@ class MyContents  {
         }
     }
 
+    updateLamp() {
+        this.buildLamp();
+    }
+
     /**
      * initializes the contents
      */
     init() {
-       
+
         // create once 
         if (this.axis === null) {
             // create and attach the axis to the scene
@@ -509,7 +546,7 @@ class MyContents  {
         }
 
         // Create the spotlight
-        this.spotLight = new THREE.SpotLight(0xffffff, 15); 
+        this.spotLight = new THREE.SpotLight(0xffffff, 15);
         this.spotLight.position.set(5, 10, 2);
         this.spotLight.distance = 14;
         this.spotLight.angle = THREE.MathUtils.degToRad(20);
@@ -522,21 +559,21 @@ class MyContents  {
         this.app.scene.add(this.spotLightHelper);
 
         // add a point light on top of the model
-        const pointLight = new THREE.PointLight( 0xffffff, 500, 0 );
-        pointLight.position.set( 0, 20, 0 );
-        this.app.scene.add( pointLight );
+        const pointLight = new THREE.PointLight(0xffffff, 500, 0);
+        pointLight.position.set(0, 20, 0);
+        this.app.scene.add(pointLight);
 
         // add a point light helper for the previous point light
         const sphereSize = 0.5;
-        const pointLightHelper = new THREE.PointLightHelper( pointLight, sphereSize );
-        this.app.scene.add( pointLightHelper );
+        const pointLightHelper = new THREE.PointLightHelper(pointLight, sphereSize);
+        this.app.scene.add(pointLightHelper);
 
         // add an ambient light
-        const ambientLight = new THREE.AmbientLight( 0x555555 );
-        this.app.scene.add( ambientLight );
+        const ambientLight = new THREE.AmbientLight(0x555555);
+        this.app.scene.add(ambientLight);
 
         this.buildBox()
-        
+
         // Build floor with room size
         this.buildFloor();
 
@@ -569,18 +606,18 @@ class MyContents  {
         this.createTVSet();
 
         this.createSofa();
-
+        this.buildLamp();
 
 
         const painting2 = new MyPainting(
-            this, 
-            0.3, 0.3, 0.15, 
+            this,
+            0.3, 0.3, 0.15,
             this.paintingImages[1] // Segunda imagem
         )
         painting2.position.y += 5
         painting2.position.x += 9.8
         painting2.position.z += 4
-        painting2.rotation.y += Math.PI/2
+        painting2.rotation.y += Math.PI / 2
         this.app.scene.add(painting2)
 
         const painting3 = new MyPainting(
@@ -591,7 +628,7 @@ class MyContents  {
         painting3.position.y += 5
         painting3.position.x += -9.8
         painting3.position.z += -4
-        painting3.rotation.y += -Math.PI/2
+        painting3.rotation.y += -Math.PI / 2
         this.app.scene.add(painting3)
 
         const painting4 = new MyPainting(
@@ -609,7 +646,7 @@ class MyContents  {
     createTVSet() {
         // Create TV stand
         this.tvStand = new MyTVStand(this);
-        this.tvStand.rotation.y = Math.PI/2
+        this.tvStand.rotation.y = Math.PI / 2
         this.tvStand.position.set(-8.8, 0, 5); // Posição do móvel da TV
         this.app.scene.add(this.tvStand);
 
@@ -621,21 +658,21 @@ class MyContents  {
             this.tvStand.position.y + 1.7, // Altura do móvel + margem
             this.tvStand.position.z
         );
-        this.television.rotation.y = Math.PI/2
+        this.television.rotation.y = Math.PI / 2
         this.app.scene.add(this.television);
     }
 
     createSofa() {
         this.sofa = new MySofa(this, this.sofaColor);
-        
+
 
         const roomHalfSize = this.roomSize / 2;
-        const offset = 1.5; 
-        
-        this.sofa.position.set(8, 0, 8.2); 
-        
-        this.sofa.rotation.y = Math.PI; 
-        
+        const offset = 1.5;
+
+        this.sofa.position.set(8, 0, 8.2);
+
+        this.sofa.rotation.y = Math.PI;
+
         this.app.scene.add(this.sofa);
     }
 
@@ -694,7 +731,7 @@ class MyContents  {
             }
         }
     }
-    
+
     /**
      * updates the diffuse plane color and the material
      * @param {THREE.Color} value 
@@ -703,7 +740,7 @@ class MyContents  {
         this.diffusePlaneColor = value
         this.planeMaterial.color.set(this.diffusePlaneColor)
     }
-    
+
     /**
      * updates the specular plane color and the material
      * @param {THREE.Color} value 
@@ -712,7 +749,7 @@ class MyContents  {
         this.specularPlaneColor = value
         // Not used with MeshStandardMaterial
     }
-    
+
     /**
      * updates the plane shininess and the material
      * @param {number} value 
@@ -721,14 +758,14 @@ class MyContents  {
         this.planeShininess = value
         // Not used with MeshStandardMaterial
     }
-    
+
     /**
      * rebuilds the box mesh if required
      * this method is called from the gui interface
      */
     rebuildBox() {
         // remove boxMesh if exists
-        if (this.boxMesh !== undefined && this.boxMesh !== null) {  
+        if (this.boxMesh !== undefined && this.boxMesh !== null) {
             this.app.scene.remove(this.boxMesh)
         }
         this.buildBox();
@@ -748,7 +785,7 @@ class MyContents  {
     rebuildChairs() {
         this.buildChairs();
     }
-    
+
     /**
      * updates the box mesh if required
      * this method is called from the render method of the app
@@ -786,9 +823,9 @@ class MyContents  {
 
     moveTableGroupToCorner(corner = 'bottom-left') {
         const roomHalfSize = this.roomSize / 2;
-        const offset = 7; 
-        
-        switch(corner) {
+        const offset = 7;
+
+        switch (corner) {
             case 'bottom-left':
                 this.tableGroup.position.set(-roomHalfSize + offset, 0, -roomHalfSize + offset);
                 break;
@@ -804,7 +841,7 @@ class MyContents  {
             default:
                 this.tableGroup.position.set(-roomHalfSize + offset, 0, -roomHalfSize + offset);
         }
-        
+
         this.tableGroupPosition = {
             x: this.tableGroup.position.x,
             y: this.tableGroup.position.y,
@@ -860,12 +897,14 @@ class MyContents  {
 
         // check if bowl and oranges need to be updated
         this.updateBowlAndOrangesIfRequired()
-
+        this.updateLamp();
         // sets the box mesh position based on the displacement vector
         this.boxMesh.position.x = this.boxDisplacement.x
         this.boxMesh.position.y = this.boxDisplacement.y
         this.boxMesh.position.z = this.boxDisplacement.z
     }
+
+   
 }
 
 export { MyContents };
