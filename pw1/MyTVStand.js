@@ -16,13 +16,13 @@ export class MyTVStand extends THREE.Group {
 
         // Materials
         this.matStand = new THREE.MeshStandardMaterial({ 
-            color: 0xecb86f, // Preto/cinza escuro para o móvel
+            color: 0x6a3d01, 
             roughness: 0.7,
             metalness: 0.3
         })
         
         this.matLeg = new THREE.MeshStandardMaterial({ 
-            color: 0xecb86f, // Preto mais escuro para as pernas
+            color: 0x6a3d01, 
             roughness: 0.8,
             metalness: 0.2
         })

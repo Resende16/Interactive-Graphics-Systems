@@ -6,6 +6,7 @@ import { MyChair } from './MyChair.js';
 import { MyTVStand } from './MyTVStand.js';
 import { MyTelevision } from './MyTelevision.js';
 import { MySofa } from './MySofa.js';
+import { MySphere } from './MySphere.js';
 
 /**
  *  This class contains the contents of out application
@@ -55,12 +56,18 @@ class MyContents  {
         this.chairEnabled = true
         this.lastChairEnabled = null
         this.chairs = []
-        this.chairColor = 0xb17f39 
+        this.chairColor = 0xf4eee6
+
+        // bowl and oranges related attributes
+        this.bowlAndOrangesEnabled = true
+        this.lastBowlAndOrangesEnabled = null
+        this.bowlAndOrangesGroup = null
+        this.bowlColor = 0xf4eee6  
+        this.orangeColor = 0xff8c00 
         
         // painting related attributes
         this.paintingColor = 0xffff00
 
-        // Caminhos das imagens locais da pasta textures
         this.paintingImages = [
             './textures/painting1.jpg',
             './textures/painting2.jpg',
@@ -81,9 +88,25 @@ class MyContents  {
         this.sofa = null
         this.sofaEnabled = true
         this.lastSofaEnabled = null
-        this.sofaColor = 0xeedcc4
+        this.sofaColor = 0xf4eee6
 
         this.cushionColor = 0xaedbea
+
+        // carpet related attributes
+        this.carpetEnabled = true
+        this.lastCarpetEnabled = null
+        this.carpetMesh = null
+        this.carpetWidth = 6
+        this.carpetDepth = 9
+        this.carpetHeight = 0.01
+        this.carpetColor = 0xf4eee6
+
+        // baseboard related attributes
+        this.baseboardEnabled = true
+        this.lastBaseboardEnabled = null
+        this.baseboards = []
+        this.baseboardHeight = 0.3
+        this.baseboardDepth = 0.1
 
     }
 
@@ -164,13 +187,11 @@ class MyContents  {
     loadFloorTexture() {
         const textureLoader = new THREE.TextureLoader();
         textureLoader.load(
-            './textures/floor.png', // Caminho para a sua textura PNG
+            './textures/floor.png', 
             (texture) => {
-                // Configurar a textura para repetir
                 texture.wrapS = THREE.RepeatWrapping;
                 texture.wrapT = THREE.RepeatWrapping;
                 
-                // Definir repetição da textura (ajuste conforme necessário)
                 const repeatCount = 4; // Quantas vezes a textura se repete
                 texture.repeat.set(repeatCount, repeatCount);
                 
@@ -183,10 +204,49 @@ class MyContents  {
             undefined,
             (error) => {
                 console.error('Erro ao carregar textura do chão:', error);
-                // Fallback: usar cor sólida
                 this.planeMaterial.color.set(this.diffusePlaneColor);
             }
         );
+    }
+
+    /**
+     * creates a bowl with oranges on the table
+     */
+    createBowlWithOranges() {
+        // Remove existing bowl and oranges if they exist
+        if (this.bowlAndOrangesGroup !== undefined && this.bowlAndOrangesGroup !== null) {
+            this.tableGroup.remove(this.bowlAndOrangesGroup);
+        }
+
+        // Create a group for bowl and oranges
+        this.bowlAndOrangesGroup = new THREE.Group();
+        
+        // Create the bowl (half sphere)
+        const bowl = new MySphere(this, 0.8, this.bowlColor, 32, true);
+        bowl.position.y = 0.5; // Adjust height to sit on table
+        bowl.rotation.x = Math.PI
+        
+        // Create oranges (small spheres)
+        const orangePositions = [
+            { x: -0.3, y: 0.2, z: 0.2 },
+            { x: 0.3, y: 0.2, z: -0.2 },
+            { x: 0, y: 0.5, z: 0 }
+        ];
+
+        orangePositions.forEach(pos => {
+            const orange = new MySphere(this, 0.3, this.orangeColor, 16, false);
+            orange.position.set(pos.x, pos.y, pos.z);
+            this.bowlAndOrangesGroup.add(orange);
+        });
+
+        this.bowlAndOrangesGroup.add(bowl);
+        
+        // Position the bowl group on the table
+        this.bowlAndOrangesGroup.position.y = 3.5; // Height of table + bowl base
+        
+        if (this.bowlAndOrangesEnabled) {
+            this.tableGroup.add(this.bowlAndOrangesGroup);
+        }
     }
 
     /**
@@ -227,6 +287,213 @@ class MyContents  {
         this.chairs.forEach(chair => {
             chair.updateColor(value)
         })
+    }
+
+    /**
+     * updates the bowl and oranges visibility if required
+     */
+    updateBowlAndOrangesIfRequired() {
+        if (this.bowlAndOrangesEnabled !== this.lastBowlAndOrangesEnabled) {
+            this.lastBowlAndOrangesEnabled = this.bowlAndOrangesEnabled;
+            if (this.bowlAndOrangesGroup) {
+                if (this.bowlAndOrangesEnabled) {
+                    this.tableGroup.add(this.bowlAndOrangesGroup);
+                } else {
+                    this.tableGroup.remove(this.bowlAndOrangesGroup);
+                }
+            }
+        }
+    }
+
+    /**
+     * builds the carpet under the table
+     */
+    buildCarpet() {
+        // Remove existing carpet if it exists
+        if (this.carpetMesh !== undefined && this.carpetMesh !== null) {
+            this.app.scene.remove(this.carpetMesh);
+        }
+
+        // Create carpet material with texture
+        this.carpetMaterial = new THREE.MeshStandardMaterial({ 
+            color: this.carpetColor,
+            roughness: 0.9,
+            metalness: 0.1
+        });
+
+        // Load carpet texture
+        this.loadCarpetTexture();
+
+        // Create carpet geometry
+        const carpetGeometry = new THREE.BoxGeometry(this.carpetWidth, this.carpetHeight, this.carpetDepth);
+        this.carpetMesh = new THREE.Mesh(carpetGeometry, this.carpetMaterial);
+        
+        // Position carpet under the table group
+        this.carpetMesh.position.copy(this.tableGroup.position);
+        this.carpetMesh.position.y = this.carpetHeight / 2 + 0.01; // Slightly above floor
+        
+        if (this.carpetEnabled) {
+            this.app.scene.add(this.carpetMesh);
+        }
+    }
+
+    /**
+     * Loads and applies the carpet texture
+     */
+    loadCarpetTexture() {
+        const textureLoader = new THREE.TextureLoader();
+        textureLoader.load(
+            './textures/carpete.jpg', 
+            (texture) => {
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                
+                const repeatX = this.carpetWidth / 2;
+                const repeatY = this.carpetDepth / 2;
+                texture.repeat.set(repeatX, repeatY);
+                
+                this.carpetMaterial.map = texture;
+                this.carpetMaterial.needsUpdate = true;
+                
+                console.log('Textura da carpete carregada com sucesso!');
+            },
+            undefined,
+            (error) => {
+                console.error('Erro ao carregar textura da carpete:', error);
+                this.carpetMaterial.color.set(this.carpetColor);
+            }
+        );
+    }
+
+    /**
+     * builds the baseboards around the room
+     */
+    buildBaseboards() {
+        // Clear existing baseboards
+        this.baseboards.forEach(baseboard => {
+            this.app.scene.remove(baseboard);
+        });
+        this.baseboards = [];
+
+        const wallLength = this.roomSize;
+        const baseboardHeight = this.baseboardHeight;
+        const baseboardDepth = this.baseboardDepth;
+
+        // Baseboard positions: front, back, left, right
+        const baseboardConfigs = [
+            { 
+                position: [0, baseboardHeight/2, wallLength/2 - baseboardDepth/2], 
+                rotation: [0, 0, 0], 
+                size: [wallLength, baseboardHeight, baseboardDepth] 
+            },
+            { 
+                position: [0, baseboardHeight/2, -wallLength/2 + baseboardDepth/2], 
+                rotation: [0, 0, 0], 
+                size: [wallLength, baseboardHeight, baseboardDepth] 
+            },
+            { 
+                position: [-wallLength/2 + baseboardDepth/2, baseboardHeight/2, 0], 
+                rotation: [0, Math.PI/2, 0], 
+                size: [wallLength, baseboardHeight, baseboardDepth] 
+            },
+            { 
+                position: [wallLength/2 - baseboardDepth/2, baseboardHeight/2, 0], 
+                rotation: [0, Math.PI/2, 0], 
+                size: [wallLength, baseboardHeight, baseboardDepth] 
+            }
+        ];
+
+        // Create wood material for baseboards
+        this.baseboardMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x8B4513, // Brown wood color
+            roughness: 0.7,
+            metalness: 0.3
+        });
+
+        // Load wood texture for baseboards
+        this.loadBaseboardTexture();
+
+        baseboardConfigs.forEach(config => {
+            const baseboardGeometry = new THREE.BoxGeometry(...config.size);
+            const baseboardMesh = new THREE.Mesh(baseboardGeometry, this.baseboardMaterial);
+            baseboardMesh.position.set(...config.position);
+            baseboardMesh.rotation.set(...config.rotation);
+            
+            this.baseboards.push(baseboardMesh);
+            if (this.baseboardEnabled) {
+                this.app.scene.add(baseboardMesh);
+            }
+        });
+    }
+
+    /**
+     * Loads and applies the wood texture for baseboards
+     */
+    loadBaseboardTexture() {
+        const textureLoader = new THREE.TextureLoader();
+        textureLoader.load(
+            './textures/tampomesa.jpg', 
+            (texture) => {
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                
+                const repeatCount = 8; 
+                texture.repeat.set(repeatCount, 1);
+                
+                this.baseboardMaterial.map = texture;
+                this.baseboardMaterial.needsUpdate = true;
+                
+                console.log('Textura do rodapé carregada com sucesso!');
+            },
+            undefined,
+            (error) => {
+                console.error('Erro ao carregar textura do rodapé:', error);
+                this.baseboardMaterial.color.set(0x8B4513);
+            }
+        );
+    }
+
+
+    /**
+     * updates the carpet visibility if required
+     */
+    updateCarpetIfRequired() {
+        if (this.carpetEnabled !== this.lastCarpetEnabled) {
+            this.lastCarpetEnabled = this.carpetEnabled;
+            if (this.carpetMesh) {
+                if (this.carpetEnabled) {
+                    this.app.scene.add(this.carpetMesh);
+                } else {
+                    this.app.scene.remove(this.carpetMesh);
+                }
+            }
+        }
+    }
+
+    /**
+     * updates the baseboards visibility if required
+     */
+    updateBaseboardsIfRequired() {
+        if (this.baseboardEnabled !== this.lastBaseboardEnabled) {
+            this.lastBaseboardEnabled = this.baseboardEnabled;
+            this.baseboards.forEach(baseboard => {
+                if (this.baseboardEnabled) {
+                    this.app.scene.add(baseboard);
+                } else {
+                    this.app.scene.remove(baseboard);
+                }
+            });
+        }
+    }
+
+    /**
+     * updates carpet position when table group moves
+     */
+    updateCarpetPosition() {
+        if (this.carpetMesh) {
+            this.carpetMesh.position.copy(this.tableGroup.position);
+            this.carpetMesh.position.y = this.carpetHeight / 2 + 0.01;
+        }
     }
 
     /**
@@ -272,8 +539,17 @@ class MyContents  {
         let table = new MyTable(this)
         this.tableGroup.add(table)
 
+        // Create bowl with oranges on the table
+        this.createBowlWithOranges();
+
         // Create and add chairs
         this.buildChairs();
+
+        // Build baseboards
+        this.buildBaseboards();
+
+        // Build carpet under table
+        this.buildCarpet();
 
         this.moveTableGroupToCorner('bottom-left');
 
@@ -281,17 +557,7 @@ class MyContents  {
 
         this.createSofa();
 
-        // Create paintings with imagens locais
-        const painting1 = new MyPainting(
-            this, 
-            0.3, 0.3, 0.15, 
-            this.paintingImages[0] // Primeira imagem
-        )
-        painting1.position.y += 5
-        painting1.position.x += 9.8
-        painting1.position.z += -4
-        painting1.rotation.y += Math.PI/2
-        this.app.scene.add(painting1)
+
 
         const painting2 = new MyPainting(
             this, 
@@ -347,19 +613,15 @@ class MyContents  {
     }
 
     createSofa() {
-        // Criar sofá em L
         this.sofa = new MySofa(this, this.sofaColor);
         
-        // Posicionar no canto oposto à TV (canto inferior direito)
-        // A TV está em (-8.8, 0, 5) - canto superior esquerdo
-        // O sofá vai para o canto inferior direito
+
         const roomHalfSize = this.roomSize / 2;
-        const offset = 1.5; // Pequeno offset da parede
+        const offset = 1.5; 
         
         this.sofa.position.set(8, 0, 8.2); 
         
-        // Rotacionar o sofá para ficar encostado nas duas paredes
-        this.sofa.rotation.y = Math.PI; // 180 graus para ficar virado para a sala
+        this.sofa.rotation.y = Math.PI; 
         
         this.app.scene.add(this.sofa);
     }
@@ -535,6 +797,8 @@ class MyContents  {
             y: this.tableGroup.position.y,
             z: this.tableGroup.position.z
         };
+
+        this.updateCarpetPosition();
     }
 
     /**
@@ -574,6 +838,15 @@ class MyContents  {
         this.updateTVIfRequired()
 
         this.updateSofaIfRequired()
+
+        // check if carpet needs to be updated
+        this.updateCarpetIfRequired()
+
+        // check if baseboards need to be updated
+        this.updateBaseboardsIfRequired()
+
+        // check if bowl and oranges need to be updated
+        this.updateBowlAndOrangesIfRequired()
 
         // sets the box mesh position based on the displacement vector
         this.boxMesh.position.x = this.boxDisplacement.x
