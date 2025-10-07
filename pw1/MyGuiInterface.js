@@ -30,13 +30,6 @@ class MyGuiInterface  {
      */
     init() {
         // add a folder to the gui interface for the box
-        const boxFolder = this.datgui.addFolder( 'Box' );
-        boxFolder.add(this.contents, 'boxMeshSize', 0, 10).name("size").onChange( () => { this.contents.rebuildBox() } );
-        boxFolder.add(this.contents, 'boxEnabled', true).name("enabled");
-        boxFolder.add(this.contents.boxDisplacement, 'x', -5, 5)
-        boxFolder.add(this.contents.boxDisplacement, 'y', -5, 5)
-        boxFolder.add(this.contents.boxDisplacement, 'z', -5, 5)
-        boxFolder.open()
         
         const data = {  
             'diffuse color': this.contents.diffusePlaneColor,
@@ -73,14 +66,7 @@ class MyGuiInterface  {
                 this.contents.television.toggleTV(value);
             }
         });
-        tvFolder.open();
-
-        // adds a folder to the gui interface for paintings
-        const paintingFolder = this.datgui.addFolder( 'Paintings' );
-        paintingFolder.addColor( data, 'painting color' ).onChange( (value) => { 
-            this.contents.paintingColor = value;
-        } );
-        paintingFolder.open();
+        tvFolder.open();        
 
         // adds a folder to the gui interface for the table group
         const tableGroupFolder = this.datgui.addFolder('Table Group');
