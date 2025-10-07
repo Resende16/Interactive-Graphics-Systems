@@ -7,7 +7,10 @@ import { MyTVStand } from './MyTVStand.js';
 import { MyTelevision } from './MyTelevision.js';
 import { MySofa } from './MySofa.js';
 import { MySphere } from './MySphere.js';
-import { MyLamp } from './Mylamp.js';
+import { MyLamp } from './MyLamp.js';
+import { MyChasis } from './MyChasis.js';
+import { MyPanorama } from './MyPanorama.js';
+
 /**
  *  This class contains the contents of out application
  */
@@ -663,7 +666,10 @@ class MyContents {
             this.tvStand.position.z
         );
         this.television.rotation.y = Math.PI / 2
-        this.app.scene.add(this.television);
+        this.app.scene.add(this.television)
+
+        const panorama = new MyPanorama(this)
+        this.app.scene.add(panorama)
     }
 
     createSofa() {

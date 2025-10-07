@@ -36,7 +36,6 @@ export class Myoctahedron extends THREE.Group {
             3, 0, 5     // Bottom-Right-Back
         ];
 
-        // Create polyhedron geometry
         const geometry = new THREE.PolyhedronGeometry(vertices, indices, this.size, 0);
 
         // Material
@@ -60,7 +59,6 @@ export class Myoctahedron extends THREE.Group {
 
     updateColor(color) {
         this.color = color;
-        // Garante que o material existe e aceita a cor
         if (this.children[0] && this.children[0].material) {
             this.children[0].material.color.set(color);
             this.children[0].material.needsUpdate = true;

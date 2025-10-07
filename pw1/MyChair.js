@@ -14,13 +14,13 @@ export class MyChair extends THREE.Group {
         this.backHeight = 2.0
         this.backThickness = 0.1
 
-        // Materials with customizable color
+        // Materials
         this.chairColor = color
         this.matSeat = new THREE.MeshStandardMaterial({ color: this.chairColor })
         this.matLeg = new THREE.MeshStandardMaterial({ color: this.chairColor })
         this.matBack = new THREE.MeshStandardMaterial({ color: this.chairColor })
 
-        this.rotation.y = rotationY; // Apply rotation
+        this.rotation.y = rotationY;
 
         this.makeSeat();
         this.makeLegs();

@@ -18,8 +18,8 @@ export class MyPainting extends THREE.Group {
 
         // Materials
         let defaultMat = new THREE.MeshStandardMaterial({ color: 0xffffff })
-        this.mat = defaultMat // Será atualizado quando a imagem carregar
-        this.matFrame = matFrame ?? new THREE.MeshStandardMaterial({ color: 0x8B4513 }) // Madeira para a moldura
+        this.mat = defaultMat
+        this.matFrame = matFrame ?? new THREE.MeshStandardMaterial({ color: 0x8B4513 }) 
 
         this.imagePath = imagePath;
         
@@ -32,27 +32,22 @@ export class MyPainting extends THREE.Group {
             textureLoader.load(
                 this.imagePath,
                 (texture) => {
-                    // Cria material com a textura da imagem
                     this.mat = new THREE.MeshStandardMaterial({ 
                         map: texture,
                         side: THREE.DoubleSide
                     });
                     
-                    // Constrói o painting depois da textura carregar
                     this.makePainting();
                     this.makeFrame();
                 },
                 undefined,
                 (error) => {
-                    console.error('Erro a carregar imagem do painting:', error);
-                    // Fallback: usa cor sólida
-                    this.mat = new THREE.MeshStandardMaterial({ color: 0x3498db }); // Azul como fallback
+                    this.mat = new THREE.MeshStandardMaterial({ color: 0x3498db });
                     this.makePainting();
                     this.makeFrame();
                 }
             );
         } else {
-            // Sem path, usa material padrão
             this.makePainting();
             this.makeFrame();
         }

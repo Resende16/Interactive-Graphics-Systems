@@ -5,7 +5,6 @@ export class MySofa extends THREE.Group {
         super()
         this.app = app
 
-        // Cores e materiais
         this.sofaColor = color
         this.matSofa = new THREE.MeshStandardMaterial({ 
             color: this.sofaColor,
@@ -26,7 +25,7 @@ export class MySofa extends THREE.Group {
         this.armrestHeight = 2.0
         this.armrestWidth = 0.4
 
-        this.mainLength = 10  // Parte principal
+        this.mainLength = 10
     
         this.makeSofa();
     }
@@ -41,7 +40,7 @@ export class MySofa extends THREE.Group {
 
     makeMainSection() {
         const seatWidth = this.mainLength / 3;
-        const gap = 0.1; // Pequeno espaço entre os assentos
+        const gap = 0.1;
 
         // Criar 3 assentos separados
         for (let i = 0; i < 3; i++) {

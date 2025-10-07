@@ -5,12 +5,12 @@ export class MyTVStand extends THREE.Group {
         super()
         this.app = app
 
-        // Dimensões do móvel
+        // Stand
         this.standWidth = 8
         this.standHeight = 1
         this.standDepth = 2
 
-        // Dimensões das pernas (cilindros)
+        // Legs
         this.legRadius = 0.1
         this.legHeight = 0.8
 

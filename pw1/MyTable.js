@@ -1,4 +1,3 @@
-
 import * as THREE from 'three';
 
 export class MyTable extends THREE.Group {
@@ -18,9 +17,9 @@ export class MyTable extends THREE.Group {
         // Materials
         this.matTop = new THREE.MeshStandardMaterial({ 
             color: 0xffffff,
-            map: null // Para a textura de madeira
+            map: null
         })
-        this.matLeg = new THREE.MeshStandardMaterial({ color: 0x8B4513 }) // Castanho para as pernas
+        this.matLeg = new THREE.MeshStandardMaterial({ color: 0x8B4513 })
 
         this.loadTextures();
     }
@@ -42,8 +41,6 @@ export class MyTable extends THREE.Group {
             },
             undefined,
             (error) => {
-                console.error('Erro a carregar textura da mesa:', error);
-                // Fallback: constrói sem textura
                 this.makeTop();
                 this.makeLegs();
             }

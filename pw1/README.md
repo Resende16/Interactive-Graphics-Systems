@@ -27,7 +27,7 @@
     -  Changing the ambient light to red applies a uniform red tint across the entire scene, altering the global color without direction or highlights
 3. 
     - When the light moves, the bright spots (highlights) and the lit areas on objects shift. Surfaces facing the light get brighter, and surfaces facing away get darker.
-    x
+    
     - In the local illumination model, lighting is calculated per point based on the light’s position and direction, so moving the light changes how each surface is lit.
 
 
@@ -41,6 +41,6 @@
 1. 
 - When the light’s visibility was turned off, the light itself became invisible, but the helper remained visible. This is expected behavior. To hide the helper as well, we should add a boolean variable to control its visibility.
 
-- WHen we change the cordinates y of the  target moved , so the spotlight points lower.However, the light shouldn’t appear under the table because the table is blocking it.
+- When we change the cordinates y of the  target moved , so the spotlight points lower.However, the light shouldn’t appear under the table because the table is blocking it.
 
 2. ?
