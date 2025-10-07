@@ -415,22 +415,22 @@ class MyContents {
         // Baseboard positions: front, back, left, right
         const baseboardConfigs = [
             {
-                position: [0, baseboardHeight / 2, wallLength / 2 - baseboardDepth / 2],
+                position: [0, baseboardHeight / 2, wallLength / 2 - baseboardDepth / 2 - 0.1],
                 rotation: [0, 0, 0],
                 size: [wallLength, baseboardHeight, baseboardDepth]
             },
             {
-                position: [0, baseboardHeight / 2, -wallLength / 2 + baseboardDepth / 2],
+                position: [0, baseboardHeight / 2, -wallLength / 2 + baseboardDepth / 2 + 0.1],
                 rotation: [0, 0, 0],
                 size: [wallLength, baseboardHeight, baseboardDepth]
             },
             {
-                position: [-wallLength / 2 + baseboardDepth / 2, baseboardHeight / 2, 0],
+                position: [-wallLength / 2 + baseboardDepth / 2 + 0.1, baseboardHeight / 2, 0],
                 rotation: [0, Math.PI / 2, 0],
                 size: [wallLength, baseboardHeight, baseboardDepth]
             },
             {
-                position: [wallLength / 2 - baseboardDepth / 2, baseboardHeight / 2, 0],
+                position: [wallLength / 2 - baseboardDepth / 2 - 0.1, baseboardHeight / 2, 0],
                 rotation: [0, Math.PI / 2, 0],
                 size: [wallLength, baseboardHeight, baseboardDepth]
             }
