@@ -241,6 +241,19 @@ class MyContents  {
             this.app.scene.add(this.axis)
         }
 
+        // Create the spotlight
+        this.spotLight = new THREE.SpotLight(0xffffff, 15); 
+        this.spotLight.position.set(5, 10, 2);
+        this.spotLight.distance = 14;
+        this.spotLight.angle = THREE.MathUtils.degToRad(20);
+        this.spotLight.penumbra = 0;
+        this.spotLight.decay = 0;
+        this.spotLight.target.position.set(1, 0, 1);
+        this.app.scene.add(this.spotLight);
+        this.app.scene.add(this.spotLight.target);
+        this.spotLightHelper = new THREE.SpotLightHelper(this.spotLight);
+        this.app.scene.add(this.spotLightHelper);
+
         // add a point light on top of the model
         const pointLight = new THREE.PointLight( 0xffffff, 500, 0 );
         pointLight.position.set( 0, 20, 0 );

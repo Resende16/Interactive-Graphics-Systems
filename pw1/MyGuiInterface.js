@@ -119,7 +119,48 @@ class MyGuiInterface  {
         cameraFolder.add(this.app, 'activeCameraName', [ 'Perspective', 'Perspective2', 'Left', 'Top', 'Front','Right','Back'] ).name("active camera");
         cameraFolder.add(this.app.activeCamera.position, 'x', 0, 10).name("x coord")
         cameraFolder.open()
+
+
+        const lightFolder = this.datgui.addFolder('Light')
+        // Parameters object for the spotlight
+
+        const spotParams = {
+            color: "#ffffff",
+            intensity: 15,
+            distance: 14,
+            angle: 20,       // degrees
+            penumbra: 0,
+            decay: 0,
+            posY: 10,
+            targetY: 0,
+            visible: false
+        };
+
+
+        lightFolder.addColor(spotParams, 'color').onChange(val => this.contents.spotLight.color.set(val));
+        lightFolder.add(spotParams, 'intensity', 0, 50).onChange(val => this.contents.spotLight.intensity = val);
+        lightFolder.add(spotParams, 'distance', 0, 50).onChange(val => this.contents.spotLight.distance = val);
+
+        lightFolder.add(spotParams, 'angle', 1, 90).onChange(val =>
+            this.contents.spotLight.angle = THREE.MathUtils.degToRad(val)
+        );
+        lightFolder.add(spotParams, 'penumbra', 0, 1).step(0.01).onChange(val => this.contents.spotLight.penumbra = val);
+        lightFolder.add(spotParams, 'decay', 0, 5).onChange(val => this.contents.spotLight.decay = val);
+        lightFolder.add(spotParams, 'posY', -10, 20).onChange(val => this.contents.spotLight.position.y = val);
+        lightFolder.add(spotParams, 'targetY', -10, 20).onChange(val => this.contents.spotLight.target.position.y = val);
+        this.contents.spotLight.visible = spotParams.visible;
+        this.contents.spotLightHelper.visible = spotParams.visible;
+        lightFolder.add(spotParams, 'visible').onChange(val => {
+            this.contents.spotLight.visible = val;
+            if (this.contents.spotLightHelper) {
+                this.contents.spotLightHelper.visible = val;
+            }
+        });
+        lightFolder.open();
     }
+    
+
+    
 }
 
 export { MyGuiInterface };
