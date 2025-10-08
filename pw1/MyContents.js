@@ -380,8 +380,9 @@ class MyContents {
     loadCarpetTexture() {
         const textureLoader = new THREE.TextureLoader();
         textureLoader.load(
-            './textures/carpete.jpg',
+            './textures/carpet.jpg',
             (texture) => {
+                texture.colorSpace = THREE.SRGBColorSpace;
                 texture.wrapS = THREE.RepeatWrapping;
                 texture.wrapT = THREE.RepeatWrapping;
 

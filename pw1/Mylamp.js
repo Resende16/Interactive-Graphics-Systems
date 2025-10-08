@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Myoctahedron } from './Myoctahedron.js';
+import { Myoctahedron } from './MyOctahedron.js';
 
 export class MyLamp extends THREE.Group {
 

@@ -15,16 +15,18 @@ export class MyChair extends THREE.Group {
         this.backThickness = 0.1
 
         // Materials
-        this.chairColor = color
+        this.chairColor = color;
         this.matSeat = new THREE.MeshStandardMaterial({ color: this.chairColor })
         this.matLeg = new THREE.MeshStandardMaterial({ color: this.chairColor })
         this.matBack = new THREE.MeshStandardMaterial({ color: this.chairColor })
+        this.matCarpet = new THREE.MeshStandardMaterial()
 
-        this.rotation.y = rotationY;
+        this.rotation.y = rotationY
 
-        this.makeSeat();
-        this.makeLegs();
-        this.makeBack();
+        this.makeSeat()
+        this.makeLegs()
+        this.makeBack()
+        this.addCarpet()
     }
 
     makeSeat() {
@@ -33,7 +35,7 @@ export class MyChair extends THREE.Group {
             this.matSeat
         )
 
-        seat.position.y = this.legHeight + this.seatHeight / 2;
+        seat.position.y = this.legHeight + this.seatHeight / 2
         this.add(seat)
     }
 
@@ -65,7 +67,6 @@ export class MyChair extends THREE.Group {
             this.matBack
         )
 
-        // Position the back at the rear of the seat, extending upwards
         back.position.set(
             0, 
             this.legHeight + this.seatHeight + this.backHeight / 2, 
@@ -74,10 +75,45 @@ export class MyChair extends THREE.Group {
         this.add(back)
     }
 
-    /**
-     * Updates the chair color
-     * @param {number} color - The new color in hexadecimal
-     */
+    // Adds a carpet on top of the seat with a texture
+    addCarpet() {
+        const carpetWidth = 0.9 * this.seatWidth
+        const carpetDepth = 0.9 * this.seatDepth
+        const carpetThickness = 0.05;
+
+        // Load carpet texture
+        const textureLoader = new THREE.TextureLoader()
+        textureLoader.load(
+            './textures/carpet.jpg',
+            (texture) => {
+                texture.colorSpace = THREE.SRGBColorSpace
+                texture.wrapS = THREE.RepeatWrapping
+                texture.wrapT = THREE.RepeatWrapping
+                texture.minFilter = THREE.LinearFilter
+                texture.magFilter = THREE.LinearFilter
+
+                this.matCarpet.map = texture
+                this.matCarpet.needsUpdate = true
+            },
+            undefined,
+            (error) => {
+                //
+            }
+        );
+
+        const carpet = new THREE.Mesh(
+            new THREE.BoxGeometry(carpetWidth, carpetDepth, carpetThickness),
+            this.matCarpet
+        )
+
+        // Position it just above the seat
+        carpet.position.set(0, this.legHeight + this.seatHeight + carpetThickness / 2, 0)
+        carpet.rotation.x = -Math.PI / 2
+
+        this.add(carpet)
+    }
+
+    // Updates the chair color
     updateColor(color) {
         this.chairColor = color
         this.matSeat.color.set(color)
