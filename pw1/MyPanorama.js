@@ -6,9 +6,9 @@ export class MyPanorama extends THREE.Group {
         this.app = app
 
         // Sphere
-        this.radius = 50
-        this.widthSegments = 60
-        this.heightSegments = 40
+        this.radius = 200
+        this.segmentsW = 60
+        this.segmentsH = 40
 
         // Material
         this.mat = new THREE.MeshBasicMaterial({ 
@@ -25,13 +25,14 @@ export class MyPanorama extends THREE.Group {
         textureLoader.load(
             './textures/panorama.jpg', 
             (texture) => {
+                texture.colorSpace = THREE.SRGBColorSpace;
                 this.mat.map = texture;
                 this.mat.needsUpdate = true;
                 this.makeSphere();
             },
             undefined,
             (error) => {
-                console.error('Error loading panorama texture:', error);
+                console.error('Failed to load panorama texture:', error);
                 this.makeSphere();
             }
         );
@@ -39,7 +40,7 @@ export class MyPanorama extends THREE.Group {
 
     makeSphere() {
         const sphere = new THREE.Mesh(
-            new THREE.SphereGeometry(this.radius, this.widthSegments, this.heightSegments),
+            new THREE.SphereGeometry(this.radius, this.segmentsW, this.segmentsH),
             this.mat
         )
         
