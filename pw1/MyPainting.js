@@ -1,15 +1,14 @@
-
 import * as THREE from 'three';
 
 export class MyPainting extends THREE.Group {
-    constructor(app, fw, fh, fd, imagePath, matFrame) {
+    constructor(app, imagePath, matFrame, w, h, d, fw, fh, fd) {
         super()
         this.app = app
 
         // Painting itself
-        this.w = 3
-        this.h = 4
-        this.d = 0.05
+        this.w = w ?? 3
+        this.h = h ?? 4
+        this.d = d ?? 0.05
 
         // Frame
         this.fw = fw ?? 0.3
@@ -23,15 +22,16 @@ export class MyPainting extends THREE.Group {
 
         this.imagePath = imagePath;
         
-        this.loadPaintingTexture();
+        this.loadTexture();
     }
 
-    loadPaintingTexture() {
+    loadTexture() {
         if (this.imagePath) {
             const textureLoader = new THREE.TextureLoader();
             textureLoader.load(
                 this.imagePath,
                 (texture) => {
+                    texture.colorSpace = THREE.SRGBColorSpace
                     this.mat = new THREE.MeshStandardMaterial({ 
                         map: texture,
                         side: THREE.DoubleSide

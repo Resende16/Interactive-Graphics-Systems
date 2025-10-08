@@ -617,7 +617,6 @@ class MyContents {
 
         const painting1 = new MyPainting(
             this,
-            0.3, 0.3, 0.15,
             this.paintingImages[0] // Segunda imagem
         )
         painting1.position.y += 5
@@ -628,7 +627,6 @@ class MyContents {
 
         const painting2 = new MyPainting(
             this,
-            0.3, 0.3, 0.15,
             this.paintingImages[1] // Segunda imagem
         )
         painting2.position.y += 5
@@ -639,7 +637,6 @@ class MyContents {
 
         const painting3 = new MyPainting(
             this,
-            0.3, 0.3, 0.15,
             this.paintingImages[2] // Terceira imagem 
         )
         painting3.position.y += 5
@@ -659,14 +656,16 @@ class MyContents {
         this.app.scene.add(this.tvStand);
 
         // Create television
-        this.television = new MyTelevision(this);
+        this.television = new MyTelevision(this, "textures/leopard.jpg", null, 2.75, 5.25, 0.3, 0.15, 0.15, 0.35);
         // Posiciona a TV em cima do móvel
         this.television.position.set(
             this.tvStand.position.x,
-            this.tvStand.position.y + 1.7, // Altura do móvel + margem
+            this.tvStand.position.y + 3.3, // Altura do móvel + margem
             this.tvStand.position.z
         );
-        this.television.rotation.y = Math.PI / 2
+        //this.television.rotation.x = Math.PI / 2
+        //this.television.rotation.y = Math.PI / 2
+        //this.television.rotation.y += Math.PI / 2
         this.app.scene.add(this.television)
 
         const panorama = new MyPanorama(this)
