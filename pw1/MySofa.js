@@ -31,20 +31,16 @@ export class MySofa extends THREE.Group {
     }
 
     makeSofa() {
-        // Parte principal do sofá (horizontal)
         this.makeMainSection();
         
-        // Adicionar almofadas
         this.addCushions();
     }
 
     makeMainSection() {
         const seatWidth = this.mainLength / 3;
-        const gap = 0.1;
+        const gap = 0.02;
 
-        // Criar 3 assentos separados
         for (let i = 0; i < 3; i++) {
-            // Assento individual
             const seat = new THREE.Mesh(
                 new THREE.BoxGeometry(seatWidth - gap, this.seatHeight, this.seatDepth),
                 this.matSofa
@@ -53,7 +49,6 @@ export class MySofa extends THREE.Group {
             seat.position.set(xPos, this.seatHeight/2, 0)
             this.add(seat)
 
-            // Encosto individual (com frente arredondada)
             const back = new THREE.Mesh(
                 new THREE.BoxGeometry(seatWidth - gap, this.backHeight, this.backThickness),
                 this.matSofa
@@ -61,11 +56,9 @@ export class MySofa extends THREE.Group {
             back.position.set(xPos, this.seatHeight + this.backHeight/2, -this.seatDepth/2 + this.backThickness/2)
             this.add(back)
 
-            // Frente arredondada do assento
             this.addRoundedFront(xPos, seatWidth - gap);
         }
 
-        // Braço direito
         const rightArm = new THREE.Mesh(
             new THREE.BoxGeometry(this.armrestWidth, this.armrestHeight, this.seatDepth),
             this.matSofa
@@ -73,7 +66,6 @@ export class MySofa extends THREE.Group {
         rightArm.position.set(this.mainLength - this.armrestWidth/2, this.armrestHeight/2, 0)
         this.add(rightArm)
 
-        // Braço esquerdo
         const leftArm = new THREE.Mesh(
             new THREE.BoxGeometry(this.armrestWidth, this.armrestHeight, this.seatDepth),
             this.matSofa
@@ -81,12 +73,10 @@ export class MySofa extends THREE.Group {
         leftArm.position.set(this.armrestWidth/2, this.armrestHeight/2, 0)
         this.add(leftArm)
 
-        // Pernas do sofá principal
         this.addLegs(this.mainLength, 0);
     }
 
     addRoundedFront(centerX, width) {
-        // Criar frente arredondada usando cilindro
         const frontRadius = this.seatHeight / 2;
         const front = new THREE.Mesh(
             new THREE.CylinderGeometry(frontRadius, frontRadius, width, 8),
@@ -102,33 +92,29 @@ export class MySofa extends THREE.Group {
         const cushionHeight = 0.40;
         const seatWidth = this.mainLength / 3;
 
-        // Posições para as almofadas (nas extremidades)
         const cushionPositions = [
-            seatWidth / 2, // Primeiro assento (esquerda)
-            this.mainLength - seatWidth / 2 // Último assento (direita)
+            seatWidth / 2,
+            this.mainLength - seatWidth / 2 
         ];
 
         cushionPositions.forEach(xPos => {
-            // Almofada redonda
             const cushion = new THREE.Mesh(
                 new THREE.CylinderGeometry(cushionRadius, cushionRadius, cushionHeight, 16),
                 this.matCushion
             )
             cushion.position.set(
                 xPos, 
-                this.seatHeight + cushionHeight/2 + 0.05, // Em cima do assento
-                -this.seatDepth/18 // Mais para trás no assento
+                this.seatHeight + cushionHeight/2 + 0.05, 
+                -this.seatDepth/18 
             )
             this.add(cushion);
 
-            // Adicionar algum detalhe/textura à almofada
             this.addCushionDetail(xPos, cushionRadius, cushionHeight);
         });
         
     }
 
     addCushionDetail(xPos, radius, height) {
-        // Adicionar um pequeno botão ou detalhe no centro da almofada
         const button = new THREE.Mesh(
             new THREE.SphereGeometry(0.08, 8, 6),
             new THREE.MeshStandardMaterial({ color: 0xaedbea })
@@ -145,10 +131,10 @@ export class MySofa extends THREE.Group {
         const legRadius = 0.08
         const legHeight = 0.15
         const legPositions = [
-            [this.armrestWidth, -legHeight/2, -this.seatDepth/2 + legRadius], // Frente esquerda
-            [length - this.armrestWidth, -legHeight/2, -this.seatDepth/2 + legRadius], // Frente direita
-            [this.armrestWidth, -legHeight/2, this.seatDepth/2 - legRadius], // Trás esquerda
-            [length - this.armrestWidth, -legHeight/2, this.seatDepth/2 - legRadius]  // Trás direita
+            [this.armrestWidth, -legHeight/2, -this.seatDepth/2 + legRadius], 
+            [length - this.armrestWidth, -legHeight/2, -this.seatDepth/2 + legRadius], 
+            [this.armrestWidth, -legHeight/2, this.seatDepth/2 - legRadius], 
+            [length - this.armrestWidth, -legHeight/2, this.seatDepth/2 - legRadius] 
         ]
 
         legPositions.forEach(pos => {

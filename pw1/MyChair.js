@@ -81,7 +81,6 @@ export class MyChair extends THREE.Group {
         const carpetDepth = 0.9 * this.seatDepth
         const carpetThickness = 0.05;
 
-        // Load carpet texture
         const textureLoader = new THREE.TextureLoader()
         textureLoader.load(
             './textures/carpet.jpg',

@@ -51,11 +51,6 @@ class MyGuiInterface {
         wallsFolder.add(this.contents, 'wallsEnabled', true).name("enabled");
         wallsFolder.open();
 
-        // adds a folder to the gui interface for the chair
-        const chairFolder = this.datgui.addFolder('Chair');
-        chairFolder.add(this.contents, 'chairEnabled', true).name("enabled");
-        chairFolder.addColor(data, 'chair color').onChange((value) => { this.contents.updateChairColor(value) });
-        chairFolder.open();
 
         // adds a folder to the gui interface for the TV
         const tvFolder = this.datgui.addFolder('Television');
@@ -68,18 +63,7 @@ class MyGuiInterface {
         });
         tvFolder.open();
 
-        // adds a folder to the gui interface for the table group
-        const tableGroupFolder = this.datgui.addFolder('Table Group');
-        tableGroupFolder.add(this.contents.tableGroupPosition, 'x', -this.contents.roomSize / 2, this.contents.roomSize / 2)
-            .name("position x")
-            .onChange((value) => {
-                this.contents.tableGroup.position.x = value;
-            });
-        tableGroupFolder.add(this.contents.tableGroupPosition, 'z', -this.contents.roomSize / 2, this.contents.roomSize / 2)
-            .name("position z")
-            .onChange((value) => {
-                this.contents.tableGroup.position.z = value;
-            });
+
 
         const sofaFolder = this.datgui.addFolder('Sofa');
         sofaFolder.add(this.contents, 'sofaEnabled', true).name("enabled");
@@ -88,17 +72,6 @@ class MyGuiInterface {
         sofaFolder.open();
 
 
-        // Opções para mover para cantos específicos
-        const cornerOptions = {
-            corner: 'bottom-left'
-        };
-        tableGroupFolder.add(cornerOptions, 'corner', ['bottom-left', 'bottom-right', 'top-left', 'top-right'])
-            .name("move to corner")
-            .onChange((value) => {
-                this.contents.moveTableGroupToCorner(value);
-            });
-
-        tableGroupFolder.open();
 
         // adds a folder to the gui interface for the camera
         const cameraFolder = this.datgui.addFolder('Camera')

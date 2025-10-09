@@ -33,9 +33,9 @@ export class MySphere extends THREE.Group {
             color: this.color,
             roughness: 0.3,
             metalness: 0.1,
-            transparent: false, // Garante que não seja transparente
-            opacity: 1.0, // Opacidade total
-            side: this.halfSphere ? THREE.DoubleSide : THREE.FrontSide // Para meia esfera, renderiza ambos os lados
+            transparent: false, 
+            opacity: 1.0, 
+            side: this.halfSphere ? THREE.DoubleSide : THREE.FrontSide 
         });
 
         const sphere = new THREE.Mesh(geometry, material);

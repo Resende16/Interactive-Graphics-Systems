@@ -74,7 +74,7 @@ class MyContents {
 
         this.paintingImages = [
             './textures/selfie2.jpeg',
-            './textures/selfie2.jpeg',
+            './textures/selfiet.jpeg',
             './textures/monalisa.jpg',
             './textures/selfie2.jpeg'
         ]
@@ -617,7 +617,7 @@ class MyContents {
 
         const painting1 = new MyPainting(
             this,
-            this.paintingImages[0] // Segunda imagem
+            this.paintingImages[0] 
         )
         painting1.position.y += 5
         painting1.position.x += 9.8
@@ -627,7 +627,7 @@ class MyContents {
 
         const painting2 = new MyPainting(
             this,
-            this.paintingImages[1] // Segunda imagem
+            this.paintingImages[1] 
         )
         painting2.position.y += 5
         painting2.position.x += 9.8
@@ -637,7 +637,7 @@ class MyContents {
 
         const painting3 = new MyPainting(
             this,
-            this.paintingImages[2] // Terceira imagem 
+            this.paintingImages[2] 
         )
         painting3.position.y += 5
         painting3.position.x += -9.8
@@ -652,15 +652,14 @@ class MyContents {
         // Create TV stand
         this.tvStand = new MyTVStand(this);
         this.tvStand.rotation.y = Math.PI / 2
-        this.tvStand.position.set(-8.8, 0, 0); // Posição do móvel da TV
+        this.tvStand.position.set(-8.8, 0, 0); 
         this.app.scene.add(this.tvStand);
 
         // Create television
         this.television = new MyTelevision(this, "textures/leopard.jpg", null, 2.75, 5.25, 0.3, 0.15, 0.15, 0.35);
-        // Posiciona a TV em cima do móvel
         this.television.position.set(
             this.tvStand.position.x,
-            this.tvStand.position.y + 3.3, // Altura do móvel + margem
+            this.tvStand.position.y + 3.3, 
             this.tvStand.position.z
         );
         //this.television.rotation.x = Math.PI / 2
@@ -675,11 +674,10 @@ class MyContents {
     createSofa() {
         this.sofa = new MySofa(this, this.sofaColor);
 
-
         const roomHalfSize = this.roomSize / 2;
         const offset = 1.5;
 
-        this.sofa.position.set(-3, 0, -5);
+        this.sofa.position.set(-3, 0.2, -5);
 
         this.sofa.rotation.y = -Math.PI/2;
 
@@ -854,7 +852,7 @@ class MyContents {
 
         this.tableGroupPosition = {
             x: this.tableGroup.position.x = 5,
-            y: this.tableGroup.position.y,
+            y: this.tableGroup.position.y = 0.05,
             z: this.tableGroup.position.z
         };
 
