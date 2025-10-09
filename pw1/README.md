@@ -46,9 +46,9 @@
 1. 
 - When the light’s visibility was turned off, the light itself became invisible, but the helper remained visible. This is expected behavior. To hide the helper as well, we should add a boolean variable to control its visibility.
 
-- When we change the cordinates y of the  target moved , so the spotlight points lower.However, the light shouldn’t appear under the table because the table is blocking it.
+- When we modify the target’s y-coordinate, the spotlight adjusts its direction downward. As a result, the light is projected under the table, since the target position is set below the table’s surface.
 
-2. ?
+ 2. Yes the ligh helper behave as expected because the helper lines follow the light and show the right position
 
 ![4.5](screenshots/4.5.png)
 ![4.6](screenshots/4.6.png)
