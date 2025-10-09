@@ -12,8 +12,6 @@
 
 ![2.2](screenshots/2.2.png)
 
-
-
 ### Moodle Task - PW1-C
 
 1. 

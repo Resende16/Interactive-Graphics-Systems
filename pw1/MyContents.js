@@ -645,7 +645,8 @@ class MyContents {
         painting3.rotation.y += -Math.PI / 2
         this.app.scene.add(painting3)
 
-        
+        const chasis = new MyChasis(this)
+        this.app.scene.add(chasis)
     }
 
     createTVSet() {
