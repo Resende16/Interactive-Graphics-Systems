@@ -17,10 +17,12 @@ export class MyLamp extends THREE.Group {
 
 
         if (isPointLight) {
+            //point light
             this.light = new THREE.PointLight(0xffffff, 5, 20);
             this.light.position.set(0, 0, 0);
             this.innerLamp.add(this.light);
         } else {
+            //spot light
             this.light = new THREE.SpotLight(0xffffff, 5, 20, Math.PI / 4, 0.2, 1);
             this.light.position.set(0, 0, 0);
 
@@ -34,7 +36,7 @@ export class MyLamp extends THREE.Group {
         const wireHeight = floorLight ? position.y : ceilingY - position.y;
         const wireWidth = floorLight ? 0.1 : 0.05;
         const wireGeometry = new THREE.CylinderGeometry(wireWidth, wireWidth, wireHeight, 16);
-        
+
         const wireMaterial = new THREE.MeshStandardMaterial({
             color: 0x333333,
             metalness: 0.3,
