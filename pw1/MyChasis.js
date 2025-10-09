@@ -14,7 +14,12 @@ export class MyChasis extends THREE.Group {
         this.windowMarginW = 0.25
         this.windowMarginH = 0.25
 
-        this.mat = mat ?? new THREE.MeshStandardMaterial({ color: 0xffffff })
+        this.mat = mat ?? new THREE.MeshStandardMaterial({ //difuse walls
+
+            color: 0xffffff,
+            roughness: 1,       
+            metalness: 0        
+            })
 
         this.build()
         this.buildCutout()

@@ -1,7 +1,7 @@
 # SGI 2025/2026 - PW1
 
 ### Moodle Task - PW1-A
-- We did not observe any differences.
+- In Three.js, changing the code order of position, rotation, and scale does not affect the visual result because transformations are always applied in the fixed order: scale → rotation → position.
 
 ![2.1](screenshots/2.1.png)
 

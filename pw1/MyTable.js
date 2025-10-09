@@ -19,7 +19,11 @@ export class MyTable extends THREE.Group {
             color: 0xffffff,
             map: null
         })
-        this.matLeg = new THREE.MeshStandardMaterial({ color: 0x8B4513 })
+        this.matLeg = new THREE.MeshPhongMaterial({
+        color: 0x8B4513,
+        shininess: 60,         
+        specular: 0xffffff      // specular highlight color
+        });
 
         this.loadTextures();
     }
