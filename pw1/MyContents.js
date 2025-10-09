@@ -186,7 +186,7 @@ class MyContents {
         }
 
         const isPointLight = this.lampType === 'Point';
-        this.lamp = new MyLamp(this.lampColor,lampPosition, 0.5, this.wallHeight, isPointLight);
+        this.lamp = new MyLamp(this.lampColor,lampPosition, 0.5, this.wallHeight, isPointLight,false);
 
         this.lamp.setColor(this.lampColor);
         this.lamp.light.intensity = this.lampIntensity;
@@ -195,6 +195,29 @@ class MyContents {
             this.tableGroup.add(this.lamp);
         }
     }
+
+      buildFlorLamp() {
+        const lampPosition = new THREE.Vector3(-7, 4, 7);
+
+        if (this.lampFloor) {
+            if (this.app.scene.children.includes(this.lampFloor)) {
+                this.app.scene.remove(this.lampFloor);
+            }
+            if (this.tableGroup && this.tableGroup.children.includes(this.lampFloor)) {
+                this.tableGroup.remove(this.lampFloor);
+            }
+            this.lampFloor = null;
+        }
+
+        const isPointLight = this.lampType === 'Point';
+        this.lampFloor = new MyLamp(this.lampColor,lampPosition, 0.60, this.wallHeight, isPointLight,true);
+
+        this.lampFloor.setColor(this.lampColor);
+        this.lampFloor.light.intensity = this.lampIntensity;
+        this.app.scene.add(this.lampFloor);
+        
+    }
+
 
 
     /**
@@ -536,6 +559,7 @@ class MyContents {
     }
 
     updateLamp() {
+        this.buildFlorLamp();
         this.buildLamp();
     }
 
@@ -613,7 +637,7 @@ class MyContents {
         this.createTVSet();
 
         this.createSofa();
-        this.buildLamp();
+        this.buildFlorLamp();
 
         const painting1 = new MyPainting(
             this,
