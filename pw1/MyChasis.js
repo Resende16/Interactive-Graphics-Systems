@@ -18,8 +18,10 @@ export class MyChasis extends THREE.Group {
 
         this.build()
         this.buildCutout()
+         this.addGlassLayer(); 
     }
 
+    
     // Builds the three "full" wall sides, no cutouts
     build() {
         const wall = new THREE.Mesh(
@@ -32,7 +34,6 @@ export class MyChasis extends THREE.Group {
         // copied for reuse
         const _wall = wall.clone()
         _wall.position.z = this.distance
-
         wall.rotation.y = Math.PI / 2
         wall.position.x = this.distance
 
@@ -83,5 +84,31 @@ export class MyChasis extends THREE.Group {
 
         this.add(leftWall)
         this.add(rightWall)
+    }
+
+
+     addGlassLayer(thickness = 0.05, color = 0x88ccff, opacity = 0.3) {
+        const glassWidth = this.w * (1 - this.windowMarginW);
+        const glassHeight = this.h * (1 - this.windowMarginH);
+
+        const glassGeometry = new THREE.BoxGeometry(glassWidth, glassHeight, thickness);
+        const glassMaterial = new THREE.MeshPhysicalMaterial({
+            color,
+            transparent: true,
+            opacity,
+            transmission: 0.9, 
+            roughness: 0.05,
+            metalness: 0,
+            reflectivity: 0.5,
+            clearcoat: 1,
+            clearcoatRoughness: 0.05
+        });
+
+        const glass = new THREE.Mesh(glassGeometry, glassMaterial);
+
+        glass.position.set(0, this.h / 2, -this.distance);
+
+        this.add(glass);
+        this.glass = glass; 
     }
 }
