@@ -12,6 +12,8 @@
 
 ![2.2](screenshots/2.2.png)
 
+
+
 ### Moodle Task - PW1-C
 
 1. 
@@ -28,6 +30,11 @@
     
     - In the local illumination model, lighting is calculated per point based on the light’s position and direction, so moving the light changes how each surface is lit.
 
+![4.2](screenshots/4.2.png)
+![4.3](screenshots/4.3.png)
+![4.4](screenshots/4.4.png)
+
+
 
     
 ## Moodle Task - PW1-D
@@ -42,3 +49,20 @@
 - When we change the cordinates y of the  target moved , so the spotlight points lower.However, the light shouldn’t appear under the table because the table is blocking it.
 
 2. ?
+
+![4.5](screenshots/4.5.png)
+![4.6](screenshots/4.6.png)
+
+## Moodle Task - PW1-E
+
+1. Yes, changes to the texture wrap mode were visible in real time. For the changes to take effect, it was necessary to:
+
+- Modify the texture's wrapS and wrapT properties.
+
+- Ensure the texture was reapplied or updated in the material.
+
+- In some cases, the material or renderer needed to be refreshed to reflect the changes immediately.
+
+![5.1](screenshots/5.1.png)
+![5.2](screenshots/5.2.png)
+
