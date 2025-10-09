@@ -608,7 +608,7 @@ class MyContents {
         this.buildFloor();
 
         // Build walls
-        this.buildWalls();
+       // this.buildWalls();
 
         // Create and add table (moved to the left)
         this.tableGroup = new THREE.Group();
