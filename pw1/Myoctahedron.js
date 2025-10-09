@@ -21,7 +21,6 @@ export class Myoctahedron extends THREE.Group {
             0, 0, -1    // 5: Back
         ];
 
-        // Face indices (8 triangular faces)
         const indices = [
             // Top faces
             2, 0, 4,    // Top-Right-Front

@@ -140,40 +140,10 @@ class MyContents {
     /**
      * builds the four walls
      */
-    buildWalls() {
-        // Clear existing walls
-        this.walls.forEach(wall => {
-            this.app.scene.remove(wall);
-        });
-        this.walls = [];
 
-        const wallHeight = this.wallHeight;
-        const wallLength = this.roomSize;
-        const wallThickness = 0.3;
 
-        // Wall positions: front, back, left, right
-        const wallConfigs = [
-            { position: [0, wallHeight / 2, wallLength / 2], rotation: [0, 0, 0], size: [wallLength, wallHeight, wallThickness] },
-            { position: [0, wallHeight / 2, -wallLength / 2], rotation: [0, 0, 0], size: [wallLength, wallHeight, wallThickness] },
-            { position: [-wallLength / 2, wallHeight / 2, 0], rotation: [0, Math.PI / 2, 0], size: [wallLength, wallHeight, wallThickness] },
-            { position: [wallLength / 2, wallHeight / 2, 0], rotation: [0, Math.PI / 2, 0], size: [wallLength, wallHeight, wallThickness] }
-        ];
-
-        wallConfigs.forEach(config => {
-            const wallGeometry = new THREE.BoxGeometry(...config.size);
-            const wallMesh = new THREE.Mesh(wallGeometry, this.wallMaterial);
-            wallMesh.position.set(...config.position);
-            wallMesh.rotation.set(...config.rotation);
-
-            this.walls.push(wallMesh);
-            if (this.wallsEnabled) {
-                this.app.scene.add(wallMesh);
-            }
-        });
-    }
-
-     buildLamp() {
-        const lampPosition = new THREE.Vector3(0, this.wallHeight * 0.8, 0);
+    buildLamp() {
+        const lampPosition = new THREE.Vector3(0, this.wallHeight , 0);
 
         if (this.lamp) {
             if (this.app.scene.children.includes(this.lamp)) {
@@ -186,7 +156,7 @@ class MyContents {
         }
 
         const isPointLight = this.lampType === 'Point';
-        this.lamp = new MyLamp(this.lampColor,lampPosition, 0.5, this.wallHeight, isPointLight,false);
+        this.lamp = new MyLamp(this.lampColor, lampPosition, 0.5, this.wallHeight, isPointLight, false);
 
         this.lamp.setColor(this.lampColor);
         this.lamp.light.intensity = this.lampIntensity;
@@ -196,7 +166,7 @@ class MyContents {
         }
     }
 
-      buildFlorLamp() {
+    buildFlorLamp() {
         const lampPosition = new THREE.Vector3(-7, 4, 7);
 
         if (this.lampFloor) {
@@ -210,12 +180,12 @@ class MyContents {
         }
 
         const isPointLight = this.lampType === 'Point';
-        this.lampFloor = new MyLamp(this.lampColor,lampPosition, 0.60, this.wallHeight, isPointLight,true);
+        this.lampFloor = new MyLamp(this.lampColor, lampPosition, 0.60, this.wallHeight, isPointLight, true);
 
         this.lampFloor.setColor(this.lampColor);
         this.lampFloor.light.intensity = this.lampIntensity;
         this.app.scene.add(this.lampFloor);
-        
+
     }
 
 
@@ -352,18 +322,7 @@ class MyContents {
     /**
      * updates the bowl and oranges visibility if required
      */
-    updateBowlAndOrangesIfRequired() {
-        if (this.bowlAndOrangesEnabled !== this.lastBowlAndOrangesEnabled) {
-            this.lastBowlAndOrangesEnabled = this.bowlAndOrangesEnabled;
-            if (this.bowlAndOrangesGroup) {
-                if (this.bowlAndOrangesEnabled) {
-                    this.tableGroup.add(this.bowlAndOrangesGroup);
-                } else {
-                    this.tableGroup.remove(this.bowlAndOrangesGroup);
-                }
-            }
-        }
-    }
+
 
     /**
      * builds the carpet under the table
@@ -515,41 +474,7 @@ class MyContents {
     }
 
 
-    /**
-     * updates the carpet visibility if required
-     */
-    updateCarpetIfRequired() {
-        if (this.carpetEnabled !== this.lastCarpetEnabled) {
-            this.lastCarpetEnabled = this.carpetEnabled;
-            if (this.carpetMesh) {
-                if (this.carpetEnabled) {
-                    this.app.scene.add(this.carpetMesh);
-                } else {
-                    this.app.scene.remove(this.carpetMesh);
-                }
-            }
-        }
-    }
 
-    /**
-     * updates the baseboards visibility if required
-     */
-    updateBaseboardsIfRequired() {
-        if (this.baseboardEnabled !== this.lastBaseboardEnabled) {
-            this.lastBaseboardEnabled = this.baseboardEnabled;
-            this.baseboards.forEach(baseboard => {
-                if (this.baseboardEnabled) {
-                    this.app.scene.add(baseboard);
-                } else {
-                    this.app.scene.remove(baseboard);
-                }
-            });
-        }
-    }
-
-    /**
-     * updates carpet position when table group moves
-     */
     updateCarpetPosition() {
         if (this.carpetMesh) {
             this.carpetMesh.position.copy(this.tableGroup.position);
@@ -575,6 +500,54 @@ class MyContents {
             this.app.scene.add(this.axis)
         }
 
+
+        // add an ambient light
+        const ambientLight = new THREE.AmbientLight(0x555555);
+        this.app.scene.add(ambientLight);
+
+        //just for the questions 
+        this.createSpotLight()
+        this.buildBox()
+
+        // Build floor with room size
+        this.buildFloor();
+
+        // Create and add table (moved to the left)
+        this.tableGroup = new THREE.Group();
+        this.tableGroup.position.set(this.tableGroupPosition.x, this.tableGroupPosition.y, this.tableGroupPosition.z);
+        this.app.scene.add(this.tableGroup);
+
+        // Create and add table ao grupo
+        let table = new MyTable(this)
+        this.tableGroup.add(table)
+
+        // Create bowl with oranges on the table
+        this.createBowlWithOranges();
+
+        // Create and add chairs
+        this.buildChairs();
+
+        // Build baseboards
+        this.buildBaseboards();
+
+        // Build carpet under table
+        this.buildCarpet();
+
+        this.moveTableGroupToCorner('bottom-left');
+
+        this.createTVSet();
+
+        this.createSofa();
+        this.buildFlorLamp();
+        this.createPaiting();
+
+
+        const chasis = new MyChasis(this)
+        this.app.scene.add(chasis)
+    }
+
+    createSpotLight() {
+
         // Create the spotlight
         this.spotLight = new THREE.SpotLight(0xffffff, 15);
         this.spotLight.position.set(5, 10, 2);
@@ -598,50 +571,13 @@ class MyContents {
         const pointLightHelper = new THREE.PointLightHelper(pointLight, sphereSize);
         this.app.scene.add(pointLightHelper);
 
-        // add an ambient light
-        const ambientLight = new THREE.AmbientLight(0x555555);
-        this.app.scene.add(ambientLight);
+    }
 
-        this.buildBox()
-
-        // Build floor with room size
-        this.buildFloor();
-
-        // Build walls
-       // this.buildWalls();
-
-        // Create and add table (moved to the left)
-        this.tableGroup = new THREE.Group();
-        this.tableGroup.position.set(this.tableGroupPosition.x, this.tableGroupPosition.y, this.tableGroupPosition.z);
-        this.app.scene.add(this.tableGroup);
-
-        // Create and add table ao grupo
-        let table = new MyTable(this)
-        this.tableGroup.add(table)
-
-
-        // Create bowl with oranges on the table
-        this.createBowlWithOranges();
-
-        // Create and add chairs
-        this.buildChairs();
-
-        // Build baseboards
-        this.buildBaseboards();
-
-        // Build carpet under table
-        this.buildCarpet();
-
-        this.moveTableGroupToCorner('bottom-left');
-
-        this.createTVSet();
-
-        this.createSofa();
-        this.buildFlorLamp();
+    createPaiting() {
 
         const painting1 = new MyPainting(
             this,
-            this.paintingImages[0] 
+            this.paintingImages[0]
         )
         painting1.position.y += 5
         painting1.position.x += 9.8
@@ -651,7 +587,7 @@ class MyContents {
 
         const painting2 = new MyPainting(
             this,
-            this.paintingImages[1] 
+            this.paintingImages[1]
         )
         painting2.position.y += 5
         painting2.position.x += 9.8
@@ -661,7 +597,7 @@ class MyContents {
 
         const painting3 = new MyPainting(
             this,
-            this.paintingImages[2] 
+            this.paintingImages[2]
         )
         painting3.position.y += 5
         painting3.position.x += -9.8
@@ -669,27 +605,22 @@ class MyContents {
         painting3.rotation.y += -Math.PI / 2
         this.app.scene.add(painting3)
 
-        const chasis = new MyChasis(this)
-        this.app.scene.add(chasis)
     }
-
     createTVSet() {
         // Create TV stand
         this.tvStand = new MyTVStand(this);
         this.tvStand.rotation.y = Math.PI / 2
-        this.tvStand.position.set(-8.8, 0, 0); 
+        this.tvStand.position.set(-8.8, 0, 0);
         this.app.scene.add(this.tvStand);
 
         // Create television
         this.television = new MyTelevision(this, "textures/leopard.jpg", null, 2.75, 5.25, 0.3, 0.15, 0.15, 0.35);
         this.television.position.set(
             this.tvStand.position.x,
-            this.tvStand.position.y + 3.3, 
+            this.tvStand.position.y + 3.3,
             this.tvStand.position.z
         );
-        //this.television.rotation.x = Math.PI / 2
-        //this.television.rotation.y = Math.PI / 2
-        //this.television.rotation.y += Math.PI / 2
+
         this.app.scene.add(this.television)
 
         const panorama = new MyPanorama(this)
@@ -704,17 +635,11 @@ class MyContents {
 
         this.sofa.position.set(-3, 0.2, -5);
 
-        this.sofa.rotation.y = -Math.PI/2;
+        this.sofa.rotation.y = -Math.PI / 2;
 
         this.app.scene.add(this.sofa);
     }
 
-    toggleTV() {
-        this.tvOn = !this.tvOn;
-        if (this.television) {
-            this.television.toggleTV(this.tvOn);
-        }
-    }
 
     updateTVIfRequired() {
         if (this.tvEnabled !== this.lastTvEnabled) {
@@ -836,45 +761,12 @@ class MyContents {
         }
     }
 
-    /**
-     * updates the walls visibility if required
-     * this method is called from the render method of the app
-     * updates are triggered by wallsEnabled property changes
-     */
-    updateWallsIfRequired() {
-        if (this.wallsEnabled !== this.lastWallsEnabled) {
-            this.lastWallsEnabled = this.wallsEnabled
-            this.walls.forEach(wall => {
-                if (this.wallsEnabled) {
-                    this.app.scene.add(wall)
-                } else {
-                    this.app.scene.remove(wall)
-                }
-            });
-        }
-    }
 
-    moveTableGroupToCorner(corner = 'bottom-left') {
+
+    moveTableGroupToCorner() {
         const roomHalfSize = this.roomSize / 2;
         const offset = 7;
-
-        switch (corner) {
-            case 'bottom-left':
-                this.tableGroup.position.set(-roomHalfSize + offset, 0, -roomHalfSize + offset);
-                break;
-            case 'bottom-right':
-                this.tableGroup.position.set(roomHalfSize - offset, 0, -roomHalfSize + offset);
-                break;
-            case 'top-left':
-                this.tableGroup.position.set(-roomHalfSize + offset, 0, roomHalfSize - offset);
-                break;
-            case 'top-right':
-                this.tableGroup.position.set(roomHalfSize - offset, 0, roomHalfSize - offset);
-                break;
-            default:
-                this.tableGroup.position.set(-roomHalfSize + offset, 0, -roomHalfSize + offset);
-        }
-
+        this.tableGroup.position.set(-roomHalfSize + offset, 0, -roomHalfSize + offset);
         this.tableGroupPosition = {
             x: this.tableGroup.position.x = 5,
             y: this.tableGroup.position.y = 0.05,
@@ -889,18 +781,7 @@ class MyContents {
      * this method is called from the render method of the app
      * updates are triggered by chairEnabled property changes
      */
-    updateChairsIfRequired() {
-        if (this.chairEnabled !== this.lastChairEnabled) {
-            this.lastChairEnabled = this.chairEnabled
-            this.chairs.forEach(chair => {
-                if (this.chairEnabled) {
-                    this.tableGroup.add(chair)
-                } else {
-                    this.tableGroup.remove(chair)
-                }
-            });
-        }
-    }
+
 
     /**
      * updates the contents
@@ -912,24 +793,17 @@ class MyContents {
         this.updateBoxIfRequired()
 
         // check if walls need to be updated
-        this.updateWallsIfRequired()
 
         // check if chairs need to be updated
-        this.updateChairsIfRequired()
 
         // check if TV needs to be updated
         this.updateTVIfRequired()
 
         this.updateSofaIfRequired()
 
-        // check if carpet needs to be updated
-        this.updateCarpetIfRequired()
 
-        // check if baseboards need to be updated
-        this.updateBaseboardsIfRequired()
 
         // check if bowl and oranges need to be updated
-        this.updateBowlAndOrangesIfRequired()
         this.updateLamp();
         // sets the box mesh position based on the displacement vector
         this.boxMesh.position.x = this.boxDisplacement.x
@@ -937,7 +811,7 @@ class MyContents {
         this.boxMesh.position.z = this.boxDisplacement.z
     }
 
-   
+
 }
 
 export { MyContents };

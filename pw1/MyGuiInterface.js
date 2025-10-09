@@ -46,21 +46,11 @@ class MyGuiInterface {
         planeFolder.add(this.contents.planeMaterial, 'metalness', 0, 1).name("metalness");
         planeFolder.open();
 
-        // adds a folder to the gui interface for the walls
-        const wallsFolder = this.datgui.addFolder('Walls');
-        wallsFolder.add(this.contents, 'wallsEnabled', true).name("enabled");
-        wallsFolder.open();
-
-
         // adds a folder to the gui interface for the TV
         const tvFolder = this.datgui.addFolder('Television');
         tvFolder.add(this.contents, 'tvEnabled', true).name("enabled");
-        tvFolder.add(this.contents, 'tvOn').name("TV On").onChange((value) => {
-            this.contents.tvOn = value;
-            if (this.contents.television) {
-                this.contents.television.toggleTV(value);
-            }
-        });
+       
+    
         tvFolder.open();
 
 

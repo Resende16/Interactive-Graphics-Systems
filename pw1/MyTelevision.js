@@ -14,11 +14,6 @@ export class MyTelevision extends MyPainting {
      * Liga/desliga a TV (turn the TV on/off)
      * @param {boolean} isOn - true for on, false for off
      */
-    toggleTV(isOn) {
-        if (isOn) {
-            //this.updateScreenColor(0x4466ff);  // Change color to blue when the TV is on
-        } else {
-            //this.updateScreenColor(0x111122);  // Very dark blue when the TV is off
-        }
-    }
+    
+
 }
