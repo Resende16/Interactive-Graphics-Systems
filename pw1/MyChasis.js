@@ -23,7 +23,8 @@ export class MyChasis extends THREE.Group {
 
         this.build()
         this.buildCutout()
-         this.addGlassLayer(); 
+        this.addGlassLayer()
+        this.addWindowFrame()
     }
 
     
@@ -91,8 +92,7 @@ export class MyChasis extends THREE.Group {
         this.add(rightWall)
     }
 
-
-     addGlassLayer(thickness = 0.05, color = 0x88ccff, opacity = 0.3) {
+    addGlassLayer(thickness = 0.05, color = 0x4f6d7a, opacity = 0.7) {
         const glassWidth = this.w * (1 - this.windowMarginW);
         const glassHeight = this.h * (1 - this.windowMarginH);
 
@@ -116,4 +116,46 @@ export class MyChasis extends THREE.Group {
         this.add(glass);
         this.glass = glass; 
     }
+
+    // Add a frame to the window
+    addWindowFrame(frameThickness = 0.1, frameColor = 0x3a3a3a) {
+        const windowWidth = this.w * (1 - 2 * this.windowMarginW);
+        const windowHeight = this.h * (1 - 2 * this.windowMarginH);
+
+        const frameMaterial = new THREE.MeshStandardMaterial({ color: frameColor });
+
+        const zOffset = 0.002;
+        const frameOffsetZ = 0.004;
+
+        // Create 4 frame sides
+        const topFrame = new THREE.Mesh(
+            new THREE.BoxGeometry(windowWidth + frameThickness, frameThickness, this.depth),
+            frameMaterial
+        );
+        topFrame.position.set(0, this.h / 2 + windowHeight / 2 + frameThickness / 2 - 0.1, -this.distance + frameOffsetZ);
+
+        const bottomFrame = new THREE.Mesh(
+            new THREE.BoxGeometry(windowWidth + frameThickness, frameThickness, this.depth),
+            frameMaterial
+        );
+        bottomFrame.position.set(0, this.h / 2 - windowHeight / 2 - frameThickness / 2 + 0.1, -this.distance - frameOffsetZ);
+
+        const leftFrame = new THREE.Mesh(
+            new THREE.BoxGeometry(frameThickness, windowHeight + frameThickness, this.depth + zOffset),
+            frameMaterial
+        );
+        leftFrame.position.set(-this.w / 2 + windowWidth / 2 + frameThickness / 2, this.h / 2, -this.distance + zOffset);
+
+        const rightFrame = new THREE.Mesh(
+            new THREE.BoxGeometry(frameThickness, windowHeight + frameThickness, this.depth + zOffset),
+            frameMaterial
+        );
+        rightFrame.position.set(this.w / 2 - windowWidth / 2 - frameThickness / 2, this.h / 2, -this.distance + zOffset);
+
+        this.add(topFrame);
+        this.add(bottomFrame);
+        this.add(leftFrame);
+        this.add(rightFrame);
+    }
+
 }
