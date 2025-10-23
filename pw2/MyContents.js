@@ -1,7 +1,7 @@
 // MyContents.js
 import * as THREE from 'three';
 import { MyApp } from '../pw2/MyApp.js';
-import { MyCube } from '../pw2/MyCube.js';
+import { MyCube } from '../pw2/geometries/MyCube.js';
 
 class MyContents {
     constructor(app) {

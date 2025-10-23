@@ -55,7 +55,7 @@
 
 ## Moodle Task - PW1-E
 
-1. Yes, changes to the texture wrap mode were visible in real time. For the changes to take effect, it was necessary to:
+1. Yes, changes to the texture wrap mode were visible in real time. For the **changes** to take effect, it was necessary to:
 
 - Modify the texture's wrapS and wrapT properties.
 
