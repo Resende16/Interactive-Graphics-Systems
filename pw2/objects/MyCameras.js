@@ -111,7 +111,7 @@ class MyCameras {
             cam.lookAt(0, 0, 0);
         }
     }
-
+    // Used to get anchor positions for relative cameras
     _anchorPosition(anchor, size) {
         const half = size / 2;
         const anchors = {
