@@ -21,7 +21,7 @@ class MyGuiInterface {
         if (!cube) return;
 
         const cubeProperties = cube.getProperties();
-        
+
         // Cube Folder
         const cubeFolder = this.datgui.addFolder('Cube Properties');
         cubeFolder.open();
@@ -39,8 +39,23 @@ class MyGuiInterface {
             .onChange(() => {
                 cube.updateMaterial();
             });
-        
-        
+
+        const cameraFolder = this.datgui.addFolder('Camera');
+        const camNames = this.app.cameras.getCameraNames();
+
+        cameraFolder
+            .add(this.app.cameras, 'activeCameraName', camNames)
+            .name("Active Camera")
+            .onChange(value => this.app.cameras.setActive(value));
+
+        // Live update for camera position
+        const pos = this.app.cameras.activeCamera.position;
+        cameraFolder.add(pos, 'x', -50, 50).name("X");
+        cameraFolder.add(pos, 'y', -50, 50).name("Y");
+        cameraFolder.add(pos, 'z', -50, 50).name("Z");
+
+        cameraFolder.open();
+
 
     }
 }
