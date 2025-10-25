@@ -2,6 +2,10 @@
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { MyApp } from '../pw2/MyApp.js';
 import { MyContents } from '../pw2/MyContents.js';
+import { MyCube } from '../pw2/geometries/MyCube.js';
+import { MyRocks } from './objects/MyRocks.js';
+import { MyFloor } from './objects/MyFloor.js';
+
 
 class MyGuiInterface {
     constructor(app) {
@@ -17,29 +21,25 @@ class MyGuiInterface {
     init() {
         if (!this.contents) return;
 
+        // ===== CUBE CONTROLS =====
         const cube = this.contents.getCube();
-        if (!cube) return;
-
-        const cubeProperties = cube.getProperties();
-
+        if (cube) {
+            const cubeProperties = cube.getProperties();
+            
+       
+   
         // Cube Folder
         const cubeFolder = this.datgui.addFolder('Cube Properties');
         cubeFolder.open();
 
-        // Control Difuse Color
-        cubeFolder.addColor(cubeProperties, 'diffuseColor')
-            .name('Diffuse Color')
-            .onChange(() => {
-                cube.updateMaterial();
-            });
+            cubeFolder.add(cubeProperties, 'transparency', 0.1, 1.0, 0.05)
+                .name('Transparency')
+                .onChange(() => {
+                    cube.updateMaterial();
+                });
+        }
 
-        // Control Transparency
-        cubeFolder.add(cubeProperties, 'transparency', 0.1, 1.0, 0.05)
-            .name('Transparency')
-            .onChange(() => {
-                cube.updateMaterial();
-            });
-
+    
         const cameraFolder = this.datgui.addFolder('Camera');
         const camNames = this.app.cameras.getCameraNames();
 
@@ -50,13 +50,57 @@ class MyGuiInterface {
 
         // Live update for camera position
         const pos = this.app.cameras.activeCamera.position;
-        cameraFolder.add(pos, 'x', -50, 50).name("X");
-        cameraFolder.add(pos, 'y', -50, 50).name("Y");
-        cameraFolder.add(pos, 'z', -50, 50).name("Z");
-
+       
         cameraFolder.open();
 
+        // ===== ROCK CONTROLS =====
+        const rock = this.contents.getRocks();
+        if (rock) {
+            const rockProperties = rock.getProperties();
+            
+            const rockFolder = this.datgui.addFolder('Rock Properties');
+            
+            rockFolder.addColor(rockProperties, 'diffuseColor')
+                .name('Rock Color')
+                .onChange(() => {
+                    rock.updateMaterial();
+                });
 
+            rockFolder.add(rockProperties, 'transparency', 0.0, 1.0, 0.05)
+                .name('Transparency')
+                .onChange(() => {
+                    rock.updateMaterial();
+                });
+
+            rockFolder.add(rockProperties, 'scale', 0.5, 3.0, 0.1)
+                .name('Scale')
+                .onChange(() => {
+                    rock.updateScale();
+                });
+        }
+
+        // ===== FLOOR CONTROLS =====
+        const floor = this.contents.getFloor();
+        if (floor) {
+            const floorProperties = floor.getProperties();
+            
+            const floorFolder = this.datgui.addFolder('Sand Floor');
+            
+            floorFolder.add(floorProperties, 'heightVariation', 0.0, 2.0, 0.1)
+                .name('Height Variation')
+                .onChange(() => {
+                    floor.updateIrregularity();
+                });
+
+            floorFolder.add(floorProperties, 'textureRepeat', 1, 10, 0.5)
+                .name('Texture Repeat')
+                .onChange(() => {
+                    floor.updateTextureRepeat();
+                });
+
+            floorFolder.add({ regenerate: () => floor.updateIrregularity() }, 'regenerate')
+                .name('Regenerate Surface');
+        }
     }
 }
 

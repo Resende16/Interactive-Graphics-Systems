@@ -57,18 +57,32 @@ class MyApp {
     updateCameraIfRequired() {
         if (this.cameras.lastCameraName !== this.cameras.activeCameraName) {
             this.cameras.lastCameraName = this.cameras.activeCameraName;
+            const cam = this.cameras.activeCamera;
             document.getElementById("camera").innerHTML = this.cameras.activeCameraName;
 
-            if (!this.controls) {
-                this.controls = new OrbitControls(this.cameras.activeCamera, this.renderer.domElement);
-                this.controls.enableZoom = true;
+            const isFixed = cam.isFixed || false;
+
+            if (isFixed) {
+                if (this.controls) {
+                    this.controls.dispose();
+                    this.controls = null;
+                }
             } else {
-                this.controls.object = this.cameras.activeCamera;
+                if (!this.controls) {
+                    this.controls = new OrbitControls(cam, this.renderer.domElement);
+                    this.controls.enableZoom = true;
+                    this.controls.enableRotate = true;
+                    this.controls.enablePan = true;
+                    this.controls.update();
+                } else {
+                    this.controls.object = cam;
+                }
             }
 
             this.onResize();
         }
     }
+
 
     render() {
         this.stats.begin();
