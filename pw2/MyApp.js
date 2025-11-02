@@ -1,4 +1,5 @@
-// src/pw2/MyApp.js
+
+
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { MyContents } from '../pw2/MyContents.js';
@@ -22,82 +23,78 @@ class MyApp {
         this.contents = null;
     }
 
+    setContents(contents) {
+        this.contents = contents;
+        if (this.gui) {
+            this.gui.setContents(contents);
+        }
+    }
+
+    render() {
+        this.renderer.render(this.scene, this.activeCamera);
+    }
+
     init() {
         // --- Scene ---
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x101010);
 
-        // --- Stats ---
-        this.stats = new Stats();
-        this.stats.showPanel(1);
-        document.body.appendChild(this.stats.dom);
-
-        // --- Cameras ---
-        this.cameras.init();
-        this.cameras.setActive('Perspective');
-
         // --- Renderer ---
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
-        this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById("canvas").appendChild(this.renderer.domElement);
+        this.renderer.shadowMap.enabled = true;
+        document.body.appendChild(this.renderer.domElement);
 
-        // --- Resize handler ---
-        window.addEventListener('resize', this.onResize.bind(this), false);
+        // --- Cameras ---
+        this.cubeSize = 15;
+        this.cameras.init(this.cubeSize);        this.activeCamera = this.cameras.activeCamera;
+
+        // --- Controls ---
+        this.controls = new OrbitControls(this.activeCamera, this.renderer.domElement);
+        this.controls.enableDamping = true;
+        this.controls.dampingFactor = 0.03;
+
+        // --- Stats ---
+        this.stats = new Stats();
+        document.body.appendChild(this.stats.dom);
+
+        // --- Axis ---
+        this.axis = new THREE.AxesHelper(5);
+        this.scene.add(this.axis);
+
+        // --- Contents ---
+        this.contents = new MyContents(this);
+        this.contents.init();
+
+        // --- GUI ---
+        this.gui = new MyGuiInterface(this);
+        this.gui.init();
+
+        // --- Resize ---
+        this.cameras.resize();
+
+        this.animate();
     }
 
     onResize() {
-        this.cameras.resize();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.cameras.onResize(window.innerWidth, window.innerHeight);
     }
 
-    setContents(contents) { this.contents = contents; }
-    setGui(gui) { this.gui = gui; }
-
-    updateCameraIfRequired() {
-        if (this.cameras.lastCameraName !== this.cameras.activeCameraName) {
-            this.cameras.lastCameraName = this.cameras.activeCameraName;
-            const cam = this.cameras.activeCamera;
-            document.getElementById("camera").innerHTML = this.cameras.activeCameraName;
-
-            const isFixed = cam.isFixed || false;
-
-            if (isFixed) {
-                if (this.controls) {
-                    this.controls.dispose();
-                    this.controls = null;
-                }
-            } else {
-                if (!this.controls) {
-                    this.controls = new OrbitControls(cam, this.renderer.domElement);
-                    this.controls.enableZoom = true;
-                    this.controls.enableRotate = true;
-                    this.controls.enablePan = true;
-                    this.controls.update();
-                } else {
-                    this.controls.object = cam;
-                }
-            }
-
-            this.onResize();
-        }
+    switchCamera(name) {
+        this.activeCamera = this.cameras.getCamera(name);
+        this.controls.object = this.activeCamera;
+        this.controls.update();
     }
 
-
-    render() {
+    animate() {
+        requestAnimationFrame(() => this.animate());
         this.stats.begin();
-        this.updateCameraIfRequired();
 
-        if (this.contents && this.cameras.activeCamera) {
-            this.contents.update();
-        }
+        if (this.contents?.update) this.contents.update();
 
-        if (this.controls)
-            this.controls.update();
-
-        this.renderer.render(this.scene, this.cameras.activeCamera);
-
-        requestAnimationFrame(this.render.bind(this));
+        this.controls.update();
+        this.renderer.render(this.scene, this.activeCamera);
         this.stats.end();
     }
 }
