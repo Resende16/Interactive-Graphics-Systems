@@ -66,12 +66,6 @@ class MyGuiInterface {
                     rock.updateMaterial();
                 });
 
-            rockFolder.add(rockProperties, 'transparency', 0.0, 1.0, 0.05)
-                .name('Transparency')
-                .onChange(() => {
-                    rock.updateMaterial();
-                });
-
             rockFolder.add(rockProperties, 'scale', 0.5, 3.0, 0.1)
                 .name('Scale')
                 .onChange(() => {
@@ -101,6 +95,22 @@ class MyGuiInterface {
             floorFolder.add({ regenerate: () => floor.updateIrregularity() }, 'regenerate')
                 .name('Regenerate Surface');
         }
+
+        const panorama = this.contents.getPanorama();
+        if (panorama) {
+            const panoramaProperties = panorama.getProperties();
+            
+            const panoramaFolder = this.datgui.addFolder('Ocean Panorama');
+            
+            panoramaFolder.add(panoramaProperties, 'enabled')
+                .name('Show Panorama')
+                .onChange((value) => {
+                    panorama.setEnabled(value);
+                });
+            
+            
+        }
+
     }
 }
 

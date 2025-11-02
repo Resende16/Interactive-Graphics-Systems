@@ -11,11 +11,11 @@ class MyFloor {
         this.cubeSize = cubeSize;
         
         this.properties = {
-            width: this.cubeSize,
-            depth: this.cubeSize,
+            width: this.cubeSize - 0.1,
+            depth: this.cubeSize - 0.1,
             sandHeight:this.cubeSize/10,
             segments: 40, 
-            heightVariation: 0.2, 
+            heightVariation: 0.1, 
             textureRepeat: 4
         };
     }
