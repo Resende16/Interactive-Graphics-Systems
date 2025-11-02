@@ -1,3 +1,5 @@
+
+
 import * as THREE from 'three';
 
 function createLeafGeometry(width = 0.3, length = 0.6, thickness = 0.06, segments = 24) {
@@ -16,6 +18,7 @@ function createLeafGeometry(width = 0.3, length = 0.6, thickness = 0.06, segment
 
     const geom = new THREE.LatheGeometry(pts, segments);
     geom.rotateX(Math.PI/2);
+    geom.translate(0, 0, -length * 0.48);
     geom.computeVertexNormals();
     return geom;
 }

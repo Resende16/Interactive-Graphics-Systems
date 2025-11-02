@@ -35,27 +35,49 @@ class Plant {
         this.group.add(stem);
 
         const leafGeo = createLeafGeometry(this.options.leafWidth, this.options.leafLength, this.options.leafThickness, 24);
+
+        const texLoader = new THREE.TextureLoader();
+        const leafTex = texLoader.load('./textures/leaf.jpg', () => {
+        console.log('Leaf texture loaded');
+        });
+        leafTex.colorSpace = THREE.SRGBColorSpace;
+        leafTex.wrapS = leafTex.wrapT = THREE.MirroredRepeatWrapping; 
+        leafTex.repeat.set(1, 1);
+        if (this.app?.renderer?.capabilities?.getMaxAnisotropy) {
+        leafTex.anisotropy = this.app.renderer.capabilities.getMaxAnisotropy();
+        }
+
         const leafMat = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(this.options.leafColor),
-            emissive: new THREE.Color(0x000000),
-            roughness: 0.7,
-            metalness: 0.0
+        color: 0xffffff,
+        map: leafTex,
+        roughness: 0.7,
+        metalness: 0.0
         });
 
         let angle = 0;
         for (let level = 0; level < this.options.levels; level++) {
             const t = level / (this.options.levels - 1);       
             const y = (t * h);                                   
-            const ringRadius = this.options.leafLength * (1.0 - 0.55 * t); 
             const scale = (1.0 - (1.0 - this.options.taper) * t);          
 
             const leavesInRing = this.options.leavesPerLevel;
             for (let i = 0; i < leavesInRing; i++) {
                 const a = angle + (i * (2 * Math.PI / leavesInRing));
-                const x = Math.cos(a) * ringRadius * 0.35;
-                const z = Math.sin(a) * ringRadius * 0.35;
+                const ringRadius = this.options.leafLength * (1.0 - 0.55 * t);
+
+                const attach = this.options.stemRadius + this.options.leafThickness * 0.6;
+
+                const xzRadius = Math.max(attach, ringRadius * 0.15);
+
+                const x = Math.cos(a) * xzRadius;
+                const z = Math.sin(a) * xzRadius;
 
                 const leaf = new THREE.Mesh(leafGeo, leafMat.clone());
+
+                leaf.material.color
+                .set(this.options.leafColor)
+                .lerp(new THREE.Color(this.options.leafEdgeColor), 0.12);
+
                 const base = new THREE.Color(this.options.leafColor);
                 const edge = new THREE.Color(this.options.leafEdgeColor);
                 leaf.material.color.lerpColors(base, edge, 0.15 + 0.15 * Math.random());

@@ -8,7 +8,7 @@ class MyCube {
         this.material = null;
         
         this.properties = {
-            diffuseColor: "#b8f5ff",
+            diffuseColor: "#d9f2f6ff",
             transparency: 0.3,
             size: size
         };

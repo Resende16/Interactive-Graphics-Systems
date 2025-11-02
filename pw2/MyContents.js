@@ -5,6 +5,7 @@ import { MyRocks } from './objects/MyRocks.js';
 import { MyFloor } from './objects/MyFloor.js';
 import { MyPanorama } from './objects/MyPanorama.js';
 import { Plant } from './objects/MyPlant.js';
+import { MySeaStar } from './objects/MySeaStar.js';
 
 
 class MyContents {
@@ -12,6 +13,7 @@ class MyContents {
         this.app = app;
         this.cube = null;
         this.rock = null;
+        this.seaStar = null;
         this.floor = null;
         this.panorama = null;
         this.plants = [];
@@ -37,6 +39,14 @@ class MyContents {
         // Create Rock
         this.rock = new MyRocks(this.app,this.cubeSize);
         this.rock.init();
+
+        // Sea star
+        this.seaStar = new MySeaStar(this.app, this.cubeSize, {
+            armLength: this.cubeSize * 0.18,   // antes ~0.28
+            armBaseRadius: this.cubeSize * 0.022,
+            armTipRadius: this.cubeSize * 0.006
+        });
+        this.seaStar.init(new THREE.Vector3(this.cubeSize * 0.08, 0.25, this.cubeSize * 0.2));
 
     }
 
@@ -72,6 +82,10 @@ class MyContents {
     getPanorama() {
         return this.panorama;
     }
+    getSeaStar() { 
+        return this.seaStar; 
+    }
+
 }
 
 export { MyContents };

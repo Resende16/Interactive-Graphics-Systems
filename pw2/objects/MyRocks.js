@@ -8,9 +8,9 @@ class MyRocks {
         this.cubeSize = cubeSize;
 
         this.properties = {
-            diffuseColor: "#6f5638",
+            diffuseColor: "#796e63",
             transparency: 1.0,
-            heightRatio: 0.30,
+            heightRatio: 0.40,
             xzOffsetRatio: { x: -0.25, z: -0.25 },
             scale: 2
         };
@@ -51,14 +51,28 @@ class MyRocks {
             { pos: [-0.5, -1.1, -0.5], rot: [1.0, 0.7, 1.2], size: [0.5, 0.5, 0.5] }
         ];
 
-        // Create material
+        // --- TEXTURA DA ROCHA ---
+        const loader = new THREE.TextureLoader();
+        const rockTex = loader.load('./textures/rocha.jpg', () => {
+        console.log('Rock texture loaded');
+        });
+        rockTex.colorSpace = THREE.SRGBColorSpace;   // cores corretas
+        rockTex.wrapS = rockTex.wrapT = THREE.RepeatWrapping;
+        // repete a textura para não “esticar”; afina à vontade
+        rockTex.repeat.set(2.5, 2.5);
+
+        // Se quiseres anisotropy (melhor nitidez em ângulos):
+        // rockTex.anisotropy = this.app.renderer.capabilities.getMaxAnisotropy();
+
+        // MATERIAL com textura (podes manter Phong)
         this.material = new THREE.MeshPhongMaterial({
-            color: this.properties.diffuseColor,
-            transparent: this.properties.transparency < 1.0,
-            opacity: this.properties.transparency,
-            specular: 0x111111,
-            shininess: 10,
-            flatShading: true // Makes it look more rocky
+        color: this.properties.diffuseColor, // atua como tint
+        map: rockTex,
+        transparent: this.properties.transparency < 1.0,
+        opacity: this.properties.transparency,
+        specular: 0x111111,
+        shininess: 10,
+        flatShading: true
         });
 
         // Create all cubes
