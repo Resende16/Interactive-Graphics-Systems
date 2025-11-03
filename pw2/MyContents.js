@@ -6,6 +6,7 @@ import { MyFloor } from './objects/MyFloor.js';
 import { MyPanorama } from './objects/MyPanorama.js';
 import { Plant } from './objects/MyPlant.js';
 import { MySeaStar } from './objects/MySeaStar.js';
+import { MyBubbles } from './objects/MyBubbles.js';
 
 
 class MyContents {
@@ -14,6 +15,7 @@ class MyContents {
         this.cube = null;
         this.rock = null;
         this.seaStar = null;
+        this.bubbles = null;
         this.floor = null;
         this.panorama = null;
         this.plants = [];
@@ -48,6 +50,14 @@ class MyContents {
         });
         this.seaStar.init(new THREE.Vector3(this.cubeSize * 0.08, 0.25, this.cubeSize * 0.2));
 
+        this.bubbles = new MyBubbles(this.app, this.cubeSize, {
+        // podes afinar estes:
+        // spawnPerSecond: 8,
+        // radiusMin: this.cubeSize * 0.009,
+        // radiusMax: this.cubeSize * 0.016
+        });
+        this.bubbles.init();
+
     }
 
     createPlants() {
@@ -65,6 +75,7 @@ class MyContents {
     }
 
     update() {
+        if (this.bubbles) this.bubbles.update();
     }
 
     getCube() {

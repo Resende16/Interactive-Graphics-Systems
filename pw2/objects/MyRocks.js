@@ -1,163 +1,164 @@
+// MyRocks.js
 import * as THREE from 'three';
 
 class MyRocks {
-    constructor(app, cubeSize) {
-        this.app = app;
-        this.group = null;
-        this.cubes = [];
-        this.cubeSize = cubeSize;
+  constructor(app, cubeSize) {
+    this.app = app;
+    this.group = null;
+    this.parts = [];
+    this.cubeSize = cubeSize;
 
-        this.properties = {
-            diffuseColor: "#796e63",
-            transparency: 1.0,
-            heightRatio: 0.40,
-            xzOffsetRatio: { x: -0.25, z: -0.25 },
-            scale: 2
-        };
+    this.properties = {
+      diffuseColor: "#796e63",
+      transparency: 1.0,
+      heightRatio: 0.40,
+      xzOffsetRatio: { x: -0.25, z: -0.25 },
+      scale: 1.0,
+      texturePath: "./textures/rock.jpg",
+      detail: 1,              
+      noiseAmplitude: 0.18,  
+      partsCount: 8           
+    };
+  }
+
+  _noise3(x, y, z) {
+    const s = Math.sin(x * 12.9898 + y * 78.233 + z * 37.719) * 43758.5453;
+    return s - Math.floor(s);
+  }
+
+  _perturbGeometry(geo, amp = 0.15) {
+    const g = geo.toNonIndexed();
+    const pos = g.attributes.position;
+    const nrm = new THREE.BufferAttribute(new Float32Array(pos.count * 3), 3);
+
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
+      const n = this._noise3(x, y, z) * 2.0 - 1.0;
+      
+      const len = Math.max(1e-6, Math.hypot(x, y, z));
+      const nx = x / len, ny = y / len, nz = z / len;
+
+      pos.setXYZ(i, x + nx * amp * n, y + ny * amp * n, z + nz * amp * n);
+      nrm.setXYZ(i, nx, ny, nz);
+    }
+    g.setAttribute('normal', nrm);
+    g.computeBoundingBox();
+    g.computeBoundingSphere();
+    return g;
+  }
+
+  init() {
+    this.group = new THREE.Group();
+
+    const loader = new THREE.TextureLoader();
+    const rockTex = loader.load(this.properties.texturePath);
+    rockTex.colorSpace = THREE.SRGBColorSpace;
+    rockTex.wrapS = rockTex.wrapT = THREE.RepeatWrapping;
+    rockTex.repeat.set(2.0, 2.0);
+
+    const material = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(this.properties.diffuseColor),
+      map: rockTex,
+      roughness: 1.0,
+      metalness: 0.0,
+      flatShading: true,
+      transparent: this.properties.transparency < 1.0,
+      opacity: this.properties.transparency
+    });
+
+    const R = this.cubeSize * 0.16;  
+    const centers = [
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3( R*0.9,  R*0.1,  R*0.4),
+      new THREE.Vector3(-R*0.7,  0,      R*0.6),
+      new THREE.Vector3( R*0.2,  R*0.5, -R*0.7),
+      new THREE.Vector3(-R*0.6, -R*0.2, -R*0.5),
+      new THREE.Vector3( R*0.9, -R*0.4, -R*0.2),
+      new THREE.Vector3(-R*0.8,  R*0.4,  0),
+      new THREE.Vector3( 0.4*R,  -R*0.7,  R*0.6)
+    ].slice(0, this.properties.partsCount);
+
+    centers.forEach((c, idx) => {
+      const base = R * (1.15 - 0.12 * (idx % 3)); 
+      const ico = new THREE.IcosahedronGeometry(base, this.properties.detail);
+      const perturbed = this._perturbGeometry(ico, base * this.properties.noiseAmplitude);
+
+      const mesh = new THREE.Mesh(perturbed, material);
+      mesh.rotation.set(0.6*idx, 1.1*idx + 0.2, 0.3*idx);
+      mesh.position.copy(c);
+
+      mesh.castShadow = mesh.receiveShadow = true;
+      this.parts.push(mesh);
+      this.group.add(mesh);
+    });
+
+    if (this.properties.scale !== 1.0) {
+      this.group.scale.setScalar(this.properties.scale);
     }
 
-    init() {
-        // Create a group to hold all rock cubes
-        this.group = new THREE.Group();
+    this._fitToCubeAndPlace();
+    this.app.scene.add(this.group);
+  }
 
-        // Define multiple cubes with different positions, rotations and sizes
-        const cubeData = [
-            // Core/center cubes (larger)
-            { pos: [0, 0, 0], rot: [0.2, 0.3, 0.1], size: [1.5, 1.3, 1.5] },
-            { pos: [0.8, 0.1, 0.5], rot: [0.5, 0.8, 0.3], size: [1.3, 1.1, 1.3] },
-            { pos: [-0.6, 0, 0.8], rot: [0.3, 1.2, 0.4], size: [1.4, 1.2, 1.4] },
-            { pos: [0.2, 0.3, -0.8], rot: [0.7, 0.4, 0.9], size: [1.2, 1.3, 1.2] },
-            { pos: [-0.5, -0.1, -0.6], rot: [0.4, 1.5, 0.2], size: [1.3, 1.2, 1.4] },
+  _fitToCubeAndPlace() {
+    const sandHeight = this.cubeSize / 10;
+    if (!this.group) return;
 
-            // Medium cubes (fill gaps)
-            { pos: [1.1, -0.3, -0.3], rot: [0.6, 0.9, 1.1], size: [1.0, 1.1, 1.0] },
-            { pos: [-0.9, 0.2, 0], rot: [0.8, 0.5, 0.7], size: [1.0, 0.9, 1.1] },
-            { pos: [0.4, -0.7, 0.8], rot: [1.0, 0.2, 0.5], size: [0.9, 1.0, 0.9] },
-            { pos: [-0.2, 0.7, 0.5], rot: [0.3, 1.1, 0.8], size: [1.0, 0.9, 0.9] },
-            { pos: [0.7, 0.6, 0.3], rot: [0.9, 0.6, 0.4], size: [0.9, 1.0, 1.0] },
+    this.group.updateMatrixWorld(true);
+    const bbox = new THREE.Box3().setFromObject(this.group);
+    const originalHeight = Math.max(1e-6, bbox.max.y - bbox.min.y);
 
-            // Smaller detail cubes
-            { pos: [1.4, 0, 0.3], rot: [0.5, 1.3, 0.6], size: [0.7, 0.8, 0.7] },
-            { pos: [-1.2, -0.3, 0.5], rot: [1.2, 0.7, 0.9], size: [0.7, 0.7, 0.8] },
-            { pos: [0, -1.0, 0], rot: [0.4, 0.8, 1.4], size: [0.8, 0.7, 0.7] },
-            { pos: [0.5, 1.0, -0.5], rot: [0.7, 1.0, 0.3], size: [0.7, 0.7, 0.7] },
-            { pos: [-0.8, 0.3, -1.0], rot: [1.1, 0.4, 0.8], size: [0.7, 0.8, 0.7] },
-            { pos: [1.0, -0.4, 1.0], rot: [0.6, 1.2, 0.5], size: [0.6, 0.7, 0.7] },
+    const targetHeight = this.cubeSize * this.properties.heightRatio;
+    const scale = targetHeight / originalHeight;
+    this.group.scale.multiplyScalar(scale);
 
-            // Very small detail cubes (rough edges)
-            { pos: [1.5, 0.5, -0.3], rot: [0.8, 0.5, 1.3], size: [0.5, 0.5, 0.5] },
-            { pos: [-1.3, 0.7, -0.3], rot: [1.3, 0.9, 0.6], size: [0.5, 0.5, 0.5] },
-            { pos: [0.3, 1.2, 0.3], rot: [0.5, 1.4, 1.0], size: [0.5, 0.5, 0.5] },
-            { pos: [-0.5, -1.1, -0.5], rot: [1.0, 0.7, 1.2], size: [0.5, 0.5, 0.5] }
-        ];
+    this.group.updateMatrixWorld(true);
+    const bbox2 = new THREE.Box3().setFromObject(this.group);
+    const baseY = -this.cubeSize / 1.8 + sandHeight;
+    const posY = baseY - bbox2.min.y;
 
-        // --- TEXTURA DA ROCHA ---
-        const loader = new THREE.TextureLoader();
-        const rockTex = loader.load('./textures/rocha.jpg', () => {
-        console.log('Rock texture loaded');
-        });
-        rockTex.colorSpace = THREE.SRGBColorSpace;   // cores corretas
-        rockTex.wrapS = rockTex.wrapT = THREE.RepeatWrapping;
-        // repete a textura para não “esticar”; afina à vontade
-        rockTex.repeat.set(2.5, 2.5);
+    const posX = this.cubeSize * this.properties.xzOffsetRatio.x;
+    const posZ = this.cubeSize * this.properties.xzOffsetRatio.z;
 
-        // Se quiseres anisotropy (melhor nitidez em ângulos):
-        // rockTex.anisotropy = this.app.renderer.capabilities.getMaxAnisotropy();
+    this.group.position.set(posX, posY, posZ);
+  }
 
-        // MATERIAL com textura (podes manter Phong)
-        this.material = new THREE.MeshPhongMaterial({
-        color: this.properties.diffuseColor, // atua como tint
-        map: rockTex,
-        transparent: this.properties.transparency < 1.0,
-        opacity: this.properties.transparency,
-        specular: 0x111111,
-        shininess: 10,
-        flatShading: true
-        });
+  updateMaterial() {
+    if (!this.group) return;
+    this.group.traverse(o => {
+      if (o.isMesh && o.material) {
+        o.material.color.set(this.properties.diffuseColor);
+        o.material.opacity = this.properties.transparency;
+        o.material.transparent = this.properties.transparency < 1.0;
+        o.material.needsUpdate = true;
+      }
+    });
+  }
 
-        // Create all cubes
-        cubeData.forEach(data => {
-            const geometry = new THREE.BoxGeometry(data.size[0], data.size[1], data.size[2]);
-            const mesh = new THREE.Mesh(geometry, this.material);
+  updateScale() {
+    if (!this.group) return;
+    this.group.scale.setScalar(this.properties.scale);
+    this.group.updateMatrixWorld(true);
+    const bbox = new THREE.Box3().setFromObject(this.group);
+    const baseY = -this.cubeSize / 2 + this.cubeSize / 10;
+    const dy = baseY - bbox.min.y;
+    this.group.position.y += dy;
+  }
 
-            mesh.position.set(data.pos[0], data.pos[1], data.pos[2]);
-            mesh.rotation.set(data.rot[0], data.rot[1], data.rot[2]);
+  getProperties() { return this.properties; }
 
-            this.cubes.push(mesh);
-            this.group.add(mesh);
-        });
-
-        this._fitToCubeAndPlace();
-        this.app.scene.add(this.group);
-    }
-
-
-
-    _fitToCubeAndPlace() {
-        const sandHeight = this.cubeSize / 10
-        if (!this.group) return;
-
-        const bbox = new THREE.Box3().setFromObject(this.group);
-        const originalHeight = Math.max(1e-6, bbox.max.y - bbox.min.y);
-
-        const targetHeight = this.cubeSize * this.properties.heightRatio;
-        const scale = targetHeight / originalHeight;
-
-        this.group.scale.setScalar(scale);
-
-        const baseY = -this.cubeSize / 2 + sandHeight;
-        const minYScaled = bbox.min.y * scale;
-
-        const posX = this.cubeSize * this.properties.xzOffsetRatio.x;
-        const posZ = this.cubeSize * this.properties.xzOffsetRatio.z;
-        const posY = baseY - minYScaled;
-
-        this.group.position.set(posX, posY, posZ);
-    }
-
-    _placeOnFloor(sandHeight = this.cubeSize / 10) {
-        if (!this.group) return;
-        this.group.updateMatrixWorld(true);
-        const bbox = new THREE.Box3().setFromObject(this.group);
-
-        const baseY = -this.cubeSize / 2 + sandHeight;
-        const minY = bbox.min.y;
-        const dy = baseY - minY;
-
-        this.group.position.y += dy;
-        this.group.updateMatrixWorld(true);
-    }
-
-
-
-    updateMaterial() {
-        if (this.material) {
-            this.material.color.set(this.properties.diffuseColor);
-            this.material.opacity = this.properties.transparency;
-            this.material.transparent = this.properties.transparency < 1.0;
-            this.material.needsUpdate = true;
-        }
-    }
-
-    updateScale() {
-        if (!this.group) return;
-        this.group.scale.setScalar(this.properties.scale);
-        this._placeOnFloor();
-    }
-
-    getProperties() {
-        return this.properties;
-    }
-
-    dispose() {
-        if (this.group) {
-            this.app.scene.remove(this.group);
-            this.cubes.forEach(cube => {
-                cube.geometry.dispose();
-            });
-            this.material.dispose();
-        }
-    }
+  dispose() {
+    if (!this.group) return;
+    this.app.scene.remove(this.group);
+    this.group.traverse(o => {
+      if (o.isMesh) {
+        o.geometry.dispose();
+        o.material.dispose();
+      }
+    });
+    this.group = null;
+    this.parts = [];
+  }
 }
 
 export { MyRocks };
