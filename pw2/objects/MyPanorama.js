@@ -12,7 +12,7 @@ class MyPanorama {
         
         this.properties = {
             texturePath: './textures/mar.jpg',
-            radius: cubeSize * 3,
+            radius: cubeSize * 2,
             enabled: true
         };
     }   

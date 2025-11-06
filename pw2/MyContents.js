@@ -7,7 +7,7 @@ import { MyPanorama } from './objects/MyPanorama.js';
 import { Plant } from './objects/MyPlant.js';
 import { MySeaStar } from './objects/MySeaStar.js';
 import { MyBubbles } from './objects/MyBubbles.js';
-
+import { MyFish } from './objects/MyFish.js';
 
 class MyContents {
     constructor(app) {
@@ -19,8 +19,7 @@ class MyContents {
         this.floor = null;
         this.panorama = null;
         this.plants = [];
-        this.cubeSize = 15;
-
+        this.cubeSize = 30;
     }
 
     init() {
@@ -41,6 +40,9 @@ class MyContents {
         // Create Rock
         this.rock = new MyRocks(this.app,this.cubeSize);
         this.rock.init();
+
+        this.fish = new MyFish(this.app);
+        this.fish.init();
 
         // Sea star
         this.seaStar = new MySeaStar(this.app, this.cubeSize, {
