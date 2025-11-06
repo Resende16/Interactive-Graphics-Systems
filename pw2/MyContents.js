@@ -7,8 +7,8 @@ import { MyPanorama } from './objects/MyPanorama.js';
 import { Plant } from './objects/MyPlant.js';
 import { MySeaStar } from './objects/MySeaStar.js';
 import { MyBubbles } from './objects/MyBubbles.js';
-
-
+import { MyCoral } from './objects/MyCoral.js';
+import { MycoralForest } from './objects/MyCoralForest.js';
 class MyContents {
     constructor(app) {
         this.app = app;
@@ -20,10 +20,13 @@ class MyContents {
         this.panorama = null;
         this.plants = [];
         this.cubeSize = 15;
+        this.corals=[]
 
     }
 
     init() {
+
+
 
         this.panorama = new MyPanorama(this.app, this.cubeSize);
         this.panorama.init();
@@ -57,6 +60,11 @@ class MyContents {
         // radiusMax: this.cubeSize * 0.016
         });
         this.bubbles.init();
+
+        
+        
+    const forest = new MycoralForest(this.app, 0xff7799, 5);
+    const coralForest = forest.createForest(20, -2, 25, 2);
 
     }
 
