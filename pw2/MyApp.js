@@ -12,6 +12,8 @@ class MyApp {
         this.scene = null;
         this.stats = null;
 
+        this.clock = new THREE.Clock();
+
         // Cameras
         this.cameras = new MyCameras(20);
 
@@ -96,6 +98,9 @@ class MyApp {
         this.controls.update();
         this.renderer.render(this.scene, this.activeCamera);
         this.stats.end();
+
+        const delta = this.clock.getDelta();
+        this.contents.update(delta);
     }
 }
 

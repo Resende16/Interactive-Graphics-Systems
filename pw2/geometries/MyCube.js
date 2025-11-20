@@ -8,6 +8,7 @@ class MyCube {
         this.material = null;
         
         this.properties = {
+            visible: true,
             diffuseColor: "#d9f2f6ff",
             transparency: 0.3,
             size: size
@@ -61,6 +62,12 @@ class MyCube {
         if (this.mesh) {
             this.app.scene.remove(this.mesh);
             this.init();
+        }
+    }
+
+    updateVisibility() {
+        if (this.cube) {
+            this.cube.visible = this.properties.visible;
         }
     }
 

@@ -1,12 +1,11 @@
 import * as THREE from 'three';
 
-export class MyFish {
+export class MyFish2 {
   constructor(app, options = {}) {
     this.app = app;
     this.divisions = options.divisions || 200;
-    this.showCurves = options.showCurves ?? false; 
+    this.showCurves = options.showCurves ?? false;
 
-    // Curve control points
     this.curveData = {
       top: [
         [0, 0],
@@ -61,10 +60,10 @@ export class MyFish {
     };
 
     this.properties = {
-      color: options.color || "#f88f8f",
-      swimSpeed: options.swimSpeed ?? 0.8,
-      turnSmoothness: options.turnSmoothness ?? 0.05,
-      swimAmplitude: options.swimAmplitude ?? 0.25,
+      color: options.color || "#88c4ff",
+      swimSpeed: options.swimSpeed ?? 0.9,
+      turnSmoothness: options.turnSmoothness ?? 0.06,
+      swimAmplitude: options.swimAmplitude ?? 0.22,
     };
 
     this.fishGroup = new THREE.Group();
@@ -74,9 +73,6 @@ export class MyFish {
     }
 
     this.mesh = null;
-
-    // estado de movimento
-    this.direction = undefined;
     this.velocity = null;
     this.phase = Math.random() * Math.PI * 2;
   }
@@ -102,7 +98,7 @@ export class MyFish {
     const frames = this._computeFrames(topPts, bottomPts, sidePts);
     const bodyGeometry = this._buildBodyGeometry(frames, tail);
 
-    const texture = new THREE.TextureLoader().load('textures/fish3.jpg');
+    const texture = new THREE.TextureLoader().load('textures/fish4.jpg');
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.set(2, 1);
     texture.flipY = true;
@@ -124,7 +120,6 @@ export class MyFish {
     this.fishGroup.add(new THREE.Mesh(rectFin, material));
     this.fishGroup.add(new THREE.Mesh(pelvicFin, material));
   }
-
 
   _computeFrames(top, bottom, side) {
     const frames = [];
@@ -155,9 +150,6 @@ export class MyFish {
     const mirroredTail = [...tailPoints].reverse().slice(1);
     const fullTail = tailPoints.concat(mirroredTail);
 
-    if (this.showCurves)
-      this._showCurve(fullTail, 0xff00ff);
-
     const tailSlices = 5;
     const tailStep = 1 / tailSlices;
     const pts = [];
@@ -179,7 +171,6 @@ export class MyFish {
     return geom;
   }
 
-
   _createFin(basePoints, contourCurve, isTop) {
     const contour = contourCurve.getSpacedPoints(60);
     const shift = 0.05 * (isTop ? 1 : -1);
@@ -198,7 +189,6 @@ export class MyFish {
     geom.computeVertexNormals();
     return geom;
   }
-
 
   _createCurve(points) {
     return new THREE.CatmullRomCurve3(points.map(p => new THREE.Vector3(...p)));
@@ -219,12 +209,10 @@ export class MyFish {
     this.curvesGroup.add(new THREE.Line(g, m));
   }
 
-
   setPosition(x, y, z) { this.fishGroup.position.set(x, y, z); }
   setRotation(x, y, z) { this.fishGroup.rotation.set(x, y, z); }
   setScale(s) { this.fishGroup.scale.setScalar(s); }
 
-  // Cleanup
   dispose() {
     if (this.mesh) {
       this.mesh.geometry.dispose();
@@ -239,15 +227,12 @@ export class MyFish {
     const s = cubeSize;
     const t = performance.now() * 0.001;
 
-    // inicializar estado de movimento
     if (!this.velocity) {
       this.velocity = new THREE.Vector3(
         (Math.random() * 2 - 1) * this.properties.swimSpeed,
         (Math.random() * 2 - 1) * this.properties.swimSpeed * 0.5,
         (Math.random() * 2 - 1) * this.properties.swimSpeed
       );
-
-      // garantir que não fica quase parado
       if (this.velocity.length() < 0.05 * this.properties.swimSpeed) {
         this.velocity.set(this.properties.swimSpeed, 0, 0);
       }
@@ -255,12 +240,10 @@ export class MyFish {
 
     const pos = this.fishGroup.position;
 
-    // movimento base 3D
     pos.x += this.velocity.x * delta * s * 0.15;
     pos.y += this.velocity.y * delta * s * 0.10;
     pos.z += this.velocity.z * delta * s * 0.15;
 
-    // limites do aquário
     const limit = s * 0.48;
 
     if (pos.x >  limit) { pos.x = limit; this.velocity.x *= -1; }
@@ -275,11 +258,9 @@ export class MyFish {
     if (pos.y >  top)    { pos.y = top; this.velocity.y *= -1; }
     if (pos.y <  bottom) { pos.y = bottom; this.velocity.y *= -1; }
 
-    // rotação natural a apontar na direção da velocidade
     const targetRotY = Math.atan2(this.velocity.x, this.velocity.z);
     this.fishGroup.rotation.y += (targetRotY - this.fishGroup.rotation.y) * this.properties.turnSmoothness;
 
-    // wiggle do corpo
     if (this.mesh) {
       this.mesh.rotation.y = Math.sin(t * 6) * 0.15;
       this.mesh.rotation.z = Math.sin(t * 3) * 0.05;

@@ -37,6 +37,13 @@ class MyGuiInterface {
                 .onChange(() => {
                     cube.updateMaterial();
                 });
+            cubeFolder.add(cubeProperties, 'visible')
+                .name('Show Cube')
+                .onChange(() => {
+                    cube.updateVisibility();
+                });
+
+            
         }
 
     

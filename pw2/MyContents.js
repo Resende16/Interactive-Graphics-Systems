@@ -8,6 +8,7 @@ import { Plant } from './objects/MyPlant.js';
 import { MySeaStar } from './objects/MySeaStar.js';
 import { MyBubbles } from './objects/MyBubbles.js';
 import { MyFish } from './objects/MyFish.js';
+import { MyFish2 } from './objects/MyFish2.js';
 
 class MyContents {
     constructor(app) {
@@ -19,7 +20,8 @@ class MyContents {
         this.floor = null;
         this.panorama = null;
         this.plants = [];
-        this.cubeSize = 30;
+        this.fishes = [];
+        this.cubeSize = 150;
     }
 
     init() {
@@ -41,8 +43,10 @@ class MyContents {
         this.rock = new MyRocks(this.app,this.cubeSize);
         this.rock.init();
 
-        this.fish = new MyFish(this.app);
+        this.fish = new MyFish(this.app, { showCurves: false });
         this.fish.init();
+
+        this.createFishes();
 
         // Sea star
         this.seaStar = new MySeaStar(this.app, this.cubeSize, {
@@ -76,8 +80,70 @@ class MyContents {
     }
     }
 
+    createFishes() {
+        const numFishes = 10;
+        const s = this.cubeSize;
+
+        for (let i = 0; i < numFishes; i++) {
+            const scale = THREE.MathUtils.randFloat(0.6, 1.0);
+            const speed = THREE.MathUtils.randFloat(0.5, 1.2);
+
+            const FishClass = (i % 3 === 0) ? MyFish2 : MyFish;
+
+            const fish = new FishClass(this.app, {
+            showCurves: false,
+            swimSpeed: speed,
+            swimAmplitude: 0.20,
+            turnSmoothness: 0.05
+            });
+
+            fish.init();
+
+            fish.fishGroup.position.x = THREE.MathUtils.randFloat(-s * 0.3, s * 0.3);
+            fish.fishGroup.position.y = THREE.MathUtils.randFloat(-s * 0.2, s * 0.2);
+            fish.fishGroup.position.z = THREE.MathUtils.randFloat(-s * 0.3, s * 0.3);
+
+            const baseScale = (fish instanceof MyFish2) ? 0.007 : 0.005;
+            fish.fishGroup.scale.setScalar(scale * s * baseScale);
+
+            this.fishes.push(fish);
+        }
+        }
+
+
+    createFishSchool() {
+        const s = this.cubeSize;
+
+        this.schoolLeader = new MyFish(this.app, {
+            swimSpeed: 1.0, showCurves: false
+        });
+        this.schoolLeader.init();
+        this.schoolLeader.fishGroup.scale.setScalar(s * 0.03);
+        this.fishes.push(this.schoolLeader);
+
+        for (let i = 0; i < 6; i++) {
+            const follower = new MyFish(this.app, {showCurves: false,
+            swimSpeed: 0.9
+            });
+            follower.init();
+            follower.fishGroup.scale.setScalar(s * 0.02);
+
+            follower.isFollower = true;
+            follower.followTarget = this.schoolLeader;
+
+            this.fishes.push(follower);
+        }
+        }
+
     update() {
+        const delta = this.app.clock.getDelta();
+
         if (this.bubbles) this.bubbles.update();
+
+        if (this.fish) this.fish.update(delta, this.cubeSize);
+
+        for (const f of this.fishes)
+            f.update(delta, this.cubeSize);
     }
 
     getCube() {

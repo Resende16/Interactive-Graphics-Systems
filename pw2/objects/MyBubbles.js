@@ -14,7 +14,7 @@ class MyBubbles {
       spawnRangeXZ: this.cubeSize * 0.25,
       spawnPerSecond: 7,               
       radiusMin: this.cubeSize * 0.01, 
-      radiusMax: this.cubeSize * 0.028,
+      radiusMax: this.cubeSize * 0.015,
       speedMin:  this.cubeSize * 0.20,  
       speedMax:  this.cubeSize * 0.35,
       color: '#7fc9ff',
