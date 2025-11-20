@@ -63,8 +63,13 @@ export class MycoralForest {
             group.add(coralMesh);
         }
 
-        this.app.scene.add(group);
 
         return group;
+    }
+    // TODO: optimiza the material usage by sharing materials among corals,
+     setWireframeAll(value) {
+        for (const mat of this.materials) {
+            mat.wireframe = value;
+        }
     }
 }

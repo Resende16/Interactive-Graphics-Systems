@@ -20,32 +20,34 @@ class MyContents {
         this.panorama = null;
         this.plants = [];
         this.cubeSize = 15;
-        this.corals=[]
-        this.forbidden =[]
+        this.corals = []
+        this.forbidden = []
+        this.groups = {};
 
     }
 
     init() {
 
 
-
+        this.groups.corals = new THREE.Group();
+        this.app.scene.add(this.groups.corals);
         this.panorama = new MyPanorama(this.app, this.cubeSize);
         this.panorama.init();
-        
+
         // Create the Floor first (so it appears behind everything)
-        this.floor = new MyFloor(this.app,this.cubeSize);
+        this.floor = new MyFloor(this.app, this.cubeSize);
 
         this.floor.init();
 
         this.createPlants();
 
         // Create and Centralize the Cube (Aquarium)
-        this.cube = new MyCube(this.app,this.cubeSize);
- 
+        this.cube = new MyCube(this.app, this.cubeSize);
+
         this.cube.init();
 
         // Create Rock
-        this.rock = new MyRocks(this.app,this.cubeSize);
+        this.rock = new MyRocks(this.app, this.cubeSize);
         this.rock.init();
 
         // Sea star
@@ -57,46 +59,40 @@ class MyContents {
         this.seaStar.init(new THREE.Vector3(this.cubeSize * 0.08, 0.25, this.cubeSize * 0.2));
 
         this.bubbles = new MyBubbles(this.app, this.cubeSize, {
-        // podes afinar estes:
-        // spawnPerSecond: 8,
-        // radiusMin: this.cubeSize * 0.009,
-        // radiusMax: this.cubeSize * 0.016
+            // podes afinar estes:
+            // spawnPerSecond: 8,
+            // radiusMin: this.cubeSize * 0.009,
+            // radiusMax: this.cubeSize * 0.016
         });
         this.bubbles.init();
 
-        
-    const coralPositions = [
-        new THREE.Vector3(4, 0, 2),
-        new THREE.Vector3(-1, 0, -6),
-        new THREE.Vector3(-6, 0, -2),
-        new THREE.Vector3(0, 0, -4),
-         new THREE.Vector3(-2, 0, 4),
 
+        const coralPositions = [
+            new THREE.Vector3(4, 0, 2),
+            new THREE.Vector3(-1, 0, -6),
+            new THREE.Vector3(-6, 0, -2),
+            new THREE.Vector3(0, 0, -4),
+            new THREE.Vector3(-2, 0, 4),
+        ];
+        const forest = new MycoralForest(this.app, 0xff7799, 5); 
+        const forestGroup = forest.createForest(-6, coralPositions);
 
-       
+        this.groups.corals.add(forestGroup);
 
-
-    ];
-    const forest = new MycoralForest(this.app, 0xff7799, 5);
-
-    forest.createForest(
-        -6,            
-        coralPositions 
-    );
-        }
+    }
 
     createPlants() {
-    const positions = [
-        new THREE.Vector3(this.cubeSize * 0.20, 0, -this.cubeSize * 0.28), 
-        new THREE.Vector3(-this.cubeSize * 0.26, 0,  this.cubeSize * 0.15) 
-    ];
+        const positions = [
+            new THREE.Vector3(this.cubeSize * 0.20, 0, -this.cubeSize * 0.28),
+            new THREE.Vector3(-this.cubeSize * 0.26, 0, this.cubeSize * 0.15)
+        ];
 
-    this.plants = [];
-    for (const pos of positions) {
-        const plant = new Plant(this.app, this.cubeSize);
-        plant.init(pos);
-        this.plants.push(plant);
-    }
+        this.plants = [];
+        for (const pos of positions) {
+            const plant = new Plant(this.app, this.cubeSize);
+            plant.init(pos);
+            this.plants.push(plant);
+        }
     }
 
     update() {
@@ -118,8 +114,8 @@ class MyContents {
     getPanorama() {
         return this.panorama;
     }
-    getSeaStar() { 
-        return this.seaStar; 
+    getSeaStar() {
+        return this.seaStar;
     }
 
 }

@@ -5,6 +5,7 @@ export class MyCoral {
         this.app = app;
         this.color = color;
         this.size = size;
+        this.material = null; 
     }
 
     init() {
@@ -109,6 +110,7 @@ export class MyCoral {
             roughness: 0.9,
             metalness: 0.1
         });
+        this.material = mat;
 
         const mesh = new THREE.InstancedMesh(geo, mat, branches.length);
         branches.forEach((m, i) => mesh.setMatrixAt(i, m));
