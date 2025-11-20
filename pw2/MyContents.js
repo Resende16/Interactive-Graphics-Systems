@@ -8,6 +8,7 @@ import { Plant } from './objects/MyPlant.js';
 import { MySeaStar } from './objects/MySeaStar.js';
 import { MyBubbles } from './objects/MyBubbles.js';
 import { MyFish } from './objects/MyFish.js';
+import { MyFish2 } from './objects/MyFish2.js';
 
 class MyContents {
     constructor(app) {
@@ -80,14 +81,17 @@ class MyContents {
     }
 
     createFishes() {
-        const numFishes = 8;      
+        const numFishes = 10;
         const s = this.cubeSize;
 
         for (let i = 0; i < numFishes; i++) {
-            const scale = THREE.MathUtils.randFloat(0.6, 1.0);  
-            const speed = THREE.MathUtils.randFloat(0.5, 1.2);  
+            const scale = THREE.MathUtils.randFloat(0.6, 1.0);
+            const speed = THREE.MathUtils.randFloat(0.5, 1.2);
 
-            const fish = new MyFish(this.app, {
+            const FishClass = (i % 3 === 0) ? MyFish2 : MyFish;
+
+            const fish = new FishClass(this.app, {
+            showCurves: false,
             swimSpeed: speed,
             swimAmplitude: 0.20,
             turnSmoothness: 0.05
@@ -99,11 +103,13 @@ class MyContents {
             fish.fishGroup.position.y = THREE.MathUtils.randFloat(-s * 0.2, s * 0.2);
             fish.fishGroup.position.z = THREE.MathUtils.randFloat(-s * 0.3, s * 0.3);
 
-            fish.fishGroup.scale.setScalar(scale * s * 0.005);
+            const baseScale = (fish instanceof MyFish2) ? 0.007 : 0.005;
+            fish.fishGroup.scale.setScalar(scale * s * baseScale);
 
             this.fishes.push(fish);
         }
         }
+
 
     createFishSchool() {
         const s = this.cubeSize;
