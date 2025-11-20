@@ -21,6 +21,7 @@ class MyContents {
         this.plants = [];
         this.cubeSize = 15;
         this.corals=[]
+        this.forbidden =[]
 
     }
 
@@ -33,12 +34,14 @@ class MyContents {
         
         // Create the Floor first (so it appears behind everything)
         this.floor = new MyFloor(this.app,this.cubeSize);
+
         this.floor.init();
 
         this.createPlants();
 
         // Create and Centralize the Cube (Aquarium)
         this.cube = new MyCube(this.app,this.cubeSize);
+ 
         this.cube.init();
 
         // Create Rock
@@ -62,11 +65,25 @@ class MyContents {
         this.bubbles.init();
 
         
-        
-    const forest = new MycoralForest(this.app, 0xff7799, 5);
-    const coralForest = forest.createForest(20, -2, 25, 2);
+    const coralPositions = [
+        new THREE.Vector3(4, 0, 2),
+        new THREE.Vector3(-1, 0, -6),
+        new THREE.Vector3(-6, 0, -2),
+        new THREE.Vector3(0, 0, -4),
+         new THREE.Vector3(-2, 0, 4),
 
-    }
+
+       
+
+
+    ];
+    const forest = new MycoralForest(this.app, 0xff7799, 5);
+
+    forest.createForest(
+        -6,            
+        coralPositions 
+    );
+        }
 
     createPlants() {
     const positions = [
