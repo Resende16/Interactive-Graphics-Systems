@@ -10,16 +10,16 @@ class Plant {
         this.group = new THREE.Group();
 
         this.options = Object.assign({
-            stemColor: '#2e6f4e',
+            stemColor: '#864f19',
             leafColor: '#7ecb7a',
             leafEdgeColor: '#a8e6a3',
-            baseHeight: cubeSize * 0.35,       
-            stemRadius: cubeSize * 0.015,
+            baseHeight: cubeSize * 0.25,       
+            stemRadius: cubeSize * 0.010,
             levels: 12,                         
             leavesPerLevel: 3,                  
             goldenAngle: Math.PI * (3 - Math.sqrt(5)), 
-            leafLength: cubeSize * 0.15,
-            leafWidth: cubeSize * 0.05,
+            leafLength: cubeSize * 0.08,
+            leafWidth: cubeSize * 0.03,
             leafThickness: cubeSize * 0.012,
             randomTilt: 0.25,                   
             taper: 0.75                         

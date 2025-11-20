@@ -9,6 +9,7 @@ import { MySeaStar } from './objects/MySeaStar.js';
 import { MyBubbles } from './objects/MyBubbles.js';
 import { MyFish } from './objects/MyFish.js';
 import { MyFish2 } from './objects/MyFish2.js';
+import { MySubmarine } from './objects/MySubmarine.js';
 
 class MyContents {
     constructor(app) {
@@ -19,6 +20,7 @@ class MyContents {
         this.bubbles = null;
         this.floor = null;
         this.panorama = null;
+        this.submarine = null;
         this.plants = [];
         this.fishes = [];
         this.cubeSize = 150;
@@ -47,6 +49,10 @@ class MyContents {
         this.fish.init();
 
         this.createFishes();
+
+        // Submarino
+        this.submarine = new MySubmarine(this.app, this.cubeSize);
+        this.submarine.init();
 
         // Sea star
         this.seaStar = new MySeaStar(this.app, this.cubeSize, {
@@ -144,6 +150,10 @@ class MyContents {
 
         for (const f of this.fishes)
             f.update(delta, this.cubeSize);
+
+        if (this.submarine) {
+            this.submarine.update();
+        }
     }
 
     getCube() {
