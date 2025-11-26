@@ -2,8 +2,6 @@
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { MyContents } from '../pw2/MyContents.js';
-import { MyGuiInterface } from '../pw2/MyGuiInterface.js';
 import { MyCameras } from '../pw2/objects/MyCameras.js';
 import Stats from 'three/addons/libs/stats.module.js';
 
