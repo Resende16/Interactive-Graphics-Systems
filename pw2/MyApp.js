@@ -62,13 +62,6 @@ class MyApp {
         this.axis = new THREE.AxesHelper(5);
         this.scene.add(this.axis);
 
-        // --- Contents ---
-        this.contents = new MyContents(this);
-        this.contents.init();
-
-        // --- GUI ---
-        this.gui = new MyGuiInterface(this);
-        this.gui.init();
 
         // --- Resize ---
         this.cameras.resize();

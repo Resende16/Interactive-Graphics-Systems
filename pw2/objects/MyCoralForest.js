@@ -6,15 +6,16 @@ export class MycoralForest {
         this.app = app;
         this.color = color;
         this.size = size;
+        this.materials = []
     }
 
-    randomizeColor(baseColor)  {
+    randomizeColor(baseColor) {
         const c = new THREE.Color(baseColor);
         const hsl = {};
         c.getHSL(hsl);
 
-        hsl.h += (Math.random() - 0.5) * 0.06; 
-        hsl.s += (Math.random() - 0.5) * 0.10; 
+        hsl.h += (Math.random() - 0.5) * 0.06;
+        hsl.s += (Math.random() - 0.5) * 0.10;
         hsl.l += (Math.random() - 0.5) * 0.07; // antes 0.1
 
         hsl.h = THREE.MathUtils.clamp(hsl.h, 0, 1);
@@ -27,6 +28,7 @@ export class MycoralForest {
 
 
     createForest(baseHeight = -2, positions = []) {
+        console.log("CREATE firrr", performance.now());
         const group = new THREE.Group();
 
         const randomizeColor = (baseColor) => {
@@ -47,27 +49,30 @@ export class MycoralForest {
 
         for (const pos of positions) {
             const colorVar = randomizeColor(this.color);
+            console.log("CREATE CORAL", performance.now());
+
 
             const coral = new MyCoral(
                 this.app,
                 colorVar,
                 this.size * (0.8 + Math.random() * 0.4)
             );
+            // Cria o GROUP do coral (que contém o mesh), mas não adiciona ainda!
+            const coralGroup = coral.createCoral(3 + Math.floor(Math.random() * 2));
 
-            const coralMesh = coral.createCoral(3 + Math.floor(Math.random() * 2));
+            this.materials.push(coral.material);
 
-            // aplica posição fixa
-            coralMesh.position.set(pos.x, baseHeight, pos.z);
-            coralMesh.rotation.y = Math.random() * Math.PI * 2;
+            coralGroup.position.set(pos.x, baseHeight, pos.z);
+            coralGroup.rotation.y = Math.random() * Math.PI * 2;
 
-            group.add(coralMesh);
+            group.add(coralGroup);
         }
 
 
         return group;
     }
     // TODO: optimiza the material usage by sharing materials among corals,
-     setWireframeAll(value) {
+    setWireframeAll(value) {
         for (const mat of this.materials) {
             mat.wireframe = value;
         }
