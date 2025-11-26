@@ -73,7 +73,19 @@ export class MyFish2 {
     }
 
     this.mesh = null;
-    this.velocity = null;
+    
+    this.velocity = new THREE.Vector3(
+      THREE.MathUtils.randFloatSpread(2),
+      THREE.MathUtils.randFloatSpread(1),
+      THREE.MathUtils.randFloatSpread(2)
+    );
+    
+    if (this.velocity.length() > 0) {
+      this.velocity.normalize();
+    } else {
+      this.velocity.set(1, 0, 0);
+    }
+    
     this.phase = Math.random() * Math.PI * 2;
   }
 
@@ -224,44 +236,50 @@ export class MyFish2 {
   update(delta, cubeSize) {
     if (!this.fishGroup) return;
 
+    const dt = (delta && delta > 0 && delta < 1) ? delta : 0.016;
+    
     const s = cubeSize;
-    const t = performance.now() * 0.001;
+    const speed = this.properties.swimSpeed * 6;
 
-    if (!this.velocity) {
-      this.velocity = new THREE.Vector3(
-        (Math.random() * 2 - 1) * this.properties.swimSpeed,
-        (Math.random() * 2 - 1) * this.properties.swimSpeed * 0.5,
-        (Math.random() * 2 - 1) * this.properties.swimSpeed
-      );
-      if (this.velocity.length() < 0.05 * this.properties.swimSpeed) {
-        this.velocity.set(this.properties.swimSpeed, 0, 0);
-      }
-    }
+    // MOVIMENTO: Move o peixe baseado na velocidade
+    this.fishGroup.position.x += this.velocity.x * speed * dt;
+    this.fishGroup.position.y += this.velocity.y * speed * dt * 0.5;
+    this.fishGroup.position.z += this.velocity.z * speed * dt;
 
     const pos = this.fishGroup.position;
-
-    pos.x += this.velocity.x * delta * s * 0.15;
-    pos.y += this.velocity.y * delta * s * 0.10;
-    pos.z += this.velocity.z * delta * s * 0.15;
-
     const limit = s * 0.48;
 
-    if (pos.x >  limit) { pos.x = limit; this.velocity.x *= -1; }
-    if (pos.x < -limit) { pos.x = -limit; this.velocity.x *= -1; }
+    if (pos.x > limit || pos.x < -limit) {
+      pos.x = THREE.MathUtils.clamp(pos.x, -limit, limit);
+      this.velocity.x *= -1;
+    }
+    
+    if (pos.z > limit || pos.z < -limit) {
+      pos.z = THREE.MathUtils.clamp(pos.z, -limit, limit);
+      this.velocity.z *= -1;
+    }
 
-    if (pos.z >  limit) { pos.z = limit; this.velocity.z *= -1; }
-    if (pos.z < -limit) { pos.z = -limit; this.velocity.z *= -1; }
-
-    const top =  s * 0.20;
+    const top = s * 0.20;
     const bottom = -s * 0.20;
 
-    if (pos.y >  top)    { pos.y = top; this.velocity.y *= -1; }
-    if (pos.y <  bottom) { pos.y = bottom; this.velocity.y *= -1; }
+    if (pos.y > top || pos.y < bottom) {
+      pos.y = THREE.MathUtils.clamp(pos.y, bottom, top);
+      this.velocity.y *= -1;
+    }
 
-    const targetRotY = Math.atan2(this.velocity.x, this.velocity.z);
-    this.fishGroup.rotation.y += (targetRotY - this.fishGroup.rotation.y) * this.properties.turnSmoothness;
+    const targetRotY = Math.atan2(this.velocity.z, -this.velocity.x);
+    const currentRotY = this.fishGroup.rotation.y;
+    
+    let diff = targetRotY - currentRotY;
+    
+    // Normaliza a diferença para [-PI, PI]
+    while (diff > Math.PI) diff -= 2 * Math.PI;
+    while (diff < -Math.PI) diff += 2 * Math.PI;
+    
+    this.fishGroup.rotation.y += diff * this.properties.turnSmoothness;
 
     if (this.mesh) {
+      const t = performance.now() * 0.001;
       this.mesh.rotation.y = Math.sin(t * 6) * 0.15;
       this.mesh.rotation.z = Math.sin(t * 3) * 0.05;
     }

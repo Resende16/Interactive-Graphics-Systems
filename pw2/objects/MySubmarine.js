@@ -35,6 +35,7 @@ class MySubmarine {
         // eventos teclado
         window.addEventListener("keydown", this._onKeyDown);
         window.addEventListener("keyup", this._onKeyUp);
+
     }
 
     _buildGeometry() {
@@ -193,7 +194,7 @@ class MySubmarine {
         if (this.keys.has("KeyA")) this.group.rotation.y += rot;
         if (this.keys.has("KeyD")) this.group.rotation.y -= rot;
 
-        const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(this.group.quaternion);
+        const forward = new THREE.Vector3(1, 0, 0).applyQuaternion(this.group.quaternion);      
         if (this.keys.has("KeyW")) this.group.position.addScaledVector(forward, move);
         if (this.keys.has("KeyS")) this.group.position.addScaledVector(forward, -move);
 

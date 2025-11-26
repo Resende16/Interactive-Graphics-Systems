@@ -1,9 +1,5 @@
-
-
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { MyContents } from '../pw2/MyContents.js';
-import { MyGuiInterface } from '../pw2/MyGuiInterface.js';
 import { MyCameras } from '../pw2/objects/MyCameras.js';
 import Stats from 'three/addons/libs/stats.module.js';
 
@@ -23,6 +19,7 @@ class MyApp {
         this.gui = null;
         this.axis = null;
         this.contents = null;
+        this.activeCamera = null;
     }
 
     setContents(contents) {
@@ -49,7 +46,8 @@ class MyApp {
 
         // --- Cameras ---
         this.cubeSize = 15;
-        this.cameras.init(this.cubeSize);        this.activeCamera = this.cameras.activeCamera;
+        this.cameras.init(this.cubeSize);
+        this.activeCamera = this.cameras.activeCamera;
 
         // --- Controls ---
         this.controls = new OrbitControls(this.activeCamera, this.renderer.domElement);
@@ -64,15 +62,10 @@ class MyApp {
         this.axis = new THREE.AxesHelper(5);
         this.scene.add(this.axis);
 
-        // --- Contents ---
-        this.contents = new MyContents(this);
-        this.contents.init();
+        // (NÃO criamos MyContents nem MyGuiInterface aqui;
+        //  isso é feito em main.js e ligado com setContents)
 
-        // --- GUI ---
-        this.gui = new MyGuiInterface(this);
-        this.gui.init();
-
-        // --- Resize ---
+        // --- Resize inicial ---
         this.cameras.resize();
 
         this.animate();
@@ -93,14 +86,13 @@ class MyApp {
         requestAnimationFrame(() => this.animate());
         this.stats.begin();
 
-        if (this.contents?.update) this.contents.update();
+        const delta = this.clock.getDelta();
+
+        if (this.contents?.update) this.contents.update(delta);
 
         this.controls.update();
         this.renderer.render(this.scene, this.activeCamera);
         this.stats.end();
-
-        const delta = this.clock.getDelta();
-        this.contents.update(delta);
     }
 }
 

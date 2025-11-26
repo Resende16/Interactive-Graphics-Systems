@@ -75,9 +75,18 @@ export class MyFish {
 
     this.mesh = null;
 
-    // estado de movimento
-    this.direction = undefined;
-    this.velocity = null;
+    this.velocity = new THREE.Vector3(
+      THREE.MathUtils.randFloatSpread(2),
+      THREE.MathUtils.randFloatSpread(1),
+      THREE.MathUtils.randFloatSpread(2)
+    );
+    
+    if (this.velocity.length() > 0) {
+      this.velocity.normalize();
+    } else {
+      this.velocity.set(1, 0, 0); 
+    }
+    
     this.phase = Math.random() * Math.PI * 2;
   }
 
@@ -124,7 +133,6 @@ export class MyFish {
     this.fishGroup.add(new THREE.Mesh(rectFin, material));
     this.fishGroup.add(new THREE.Mesh(pelvicFin, material));
   }
-
 
   _computeFrames(top, bottom, side) {
     const frames = [];
@@ -179,7 +187,6 @@ export class MyFish {
     return geom;
   }
 
-
   _createFin(basePoints, contourCurve, isTop) {
     const contour = contourCurve.getSpacedPoints(60);
     const shift = 0.05 * (isTop ? 1 : -1);
@@ -198,7 +205,6 @@ export class MyFish {
     geom.computeVertexNormals();
     return geom;
   }
-
 
   _createCurve(points) {
     return new THREE.CatmullRomCurve3(points.map(p => new THREE.Vector3(...p)));
@@ -219,12 +225,10 @@ export class MyFish {
     this.curvesGroup.add(new THREE.Line(g, m));
   }
 
-
   setPosition(x, y, z) { this.fishGroup.position.set(x, y, z); }
   setRotation(x, y, z) { this.fishGroup.rotation.set(x, y, z); }
   setScale(s) { this.fishGroup.scale.setScalar(s); }
 
-  // Cleanup
   dispose() {
     if (this.mesh) {
       this.mesh.geometry.dispose();
@@ -236,51 +240,49 @@ export class MyFish {
   update(delta, cubeSize) {
     if (!this.fishGroup) return;
 
+    const dt = (delta && delta > 0 && delta < 1) ? delta : 0.016;
+    
     const s = cubeSize;
-    const t = performance.now() * 0.001;
+    const speed = this.properties.swimSpeed * 5; 
 
-    // inicializar estado de movimento
-    if (!this.velocity) {
-      this.velocity = new THREE.Vector3(
-        (Math.random() * 2 - 1) * this.properties.swimSpeed,
-        (Math.random() * 2 - 1) * this.properties.swimSpeed * 0.5,
-        (Math.random() * 2 - 1) * this.properties.swimSpeed
-      );
-
-      // garantir que não fica quase parado
-      if (this.velocity.length() < 0.05 * this.properties.swimSpeed) {
-        this.velocity.set(this.properties.swimSpeed, 0, 0);
-      }
-    }
+    // MOVIMENTO: Move o peixe baseado na velocidade
+    this.fishGroup.position.x += this.velocity.x * speed * dt;
+    this.fishGroup.position.y += this.velocity.y * speed * dt * 0.5;
+    this.fishGroup.position.z += this.velocity.z * speed * dt;
 
     const pos = this.fishGroup.position;
+    const limit = s * 0.45;
 
-    // movimento base 3D
-    pos.x += this.velocity.x * delta * s * 0.15;
-    pos.y += this.velocity.y * delta * s * 0.10;
-    pos.z += this.velocity.z * delta * s * 0.15;
+    if (pos.x > limit || pos.x < -limit) {
+      pos.x = THREE.MathUtils.clamp(pos.x, -limit, limit);
+      this.velocity.x *= -1;
+    }
+    
+    if (pos.z > limit || pos.z < -limit) {
+      pos.z = THREE.MathUtils.clamp(pos.z, -limit, limit);
+      this.velocity.z *= -1;
+    }
 
-    // limites do aquário
-    const limit = s * 0.48;
+    const top = s * 0.35;
+    const bottom = -s * 0.35;
 
-    if (pos.x >  limit) { pos.x = limit; this.velocity.x *= -1; }
-    if (pos.x < -limit) { pos.x = -limit; this.velocity.x *= -1; }
+    if (pos.y > top || pos.y < bottom) {
+      pos.y = THREE.MathUtils.clamp(pos.y, bottom, top);
+      this.velocity.y *= -1;
+    }
 
-    if (pos.z >  limit) { pos.z = limit; this.velocity.z *= -1; }
-    if (pos.z < -limit) { pos.z = -limit; this.velocity.z *= -1; }
+    const targetRotY = Math.atan2(this.velocity.z, -this.velocity.x);
+    const currentRotY = this.fishGroup.rotation.y;
+    
+    let diff = targetRotY - currentRotY;
+    
+    while (diff > Math.PI) diff -= 2 * Math.PI;
+    while (diff < -Math.PI) diff += 2 * Math.PI;
+    
+    this.fishGroup.rotation.y += diff * this.properties.turnSmoothness;
 
-    const top =  s * 0.20;
-    const bottom = -s * 0.20;
-
-    if (pos.y >  top)    { pos.y = top; this.velocity.y *= -1; }
-    if (pos.y <  bottom) { pos.y = bottom; this.velocity.y *= -1; }
-
-    // rotação natural a apontar na direção da velocidade
-    const targetRotY = Math.atan2(this.velocity.x, this.velocity.z);
-    this.fishGroup.rotation.y += (targetRotY - this.fishGroup.rotation.y) * this.properties.turnSmoothness;
-
-    // wiggle do corpo
     if (this.mesh) {
+      const t = performance.now() * 0.001;
       this.mesh.rotation.y = Math.sin(t * 6) * 0.15;
       this.mesh.rotation.z = Math.sin(t * 3) * 0.05;
     }
