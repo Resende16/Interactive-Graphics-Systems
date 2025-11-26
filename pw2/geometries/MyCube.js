@@ -36,9 +36,11 @@ class MyCube {
         
         this.mesh.position.set(0, 0, 0);
 
+        this.mesh.castShadow = false;
+        this.mesh.receiveShadow = false;
+
         this.app.scene.add(this.mesh);
 
-        this.addLights();
     }
 
     addLights() {

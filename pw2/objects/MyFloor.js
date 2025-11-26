@@ -160,6 +160,15 @@ class MyFloor {
 
         const y = -this.cubeSize/2 ;
 
+        this.topMesh.castShadow = false;
+        this.topMesh.receiveShadow = true;
+
+        this.bottomMesh.castShadow = false;
+        this.bottomMesh.receiveShadow = true;
+
+        this.sidesMesh.castShadow = true;
+        this.sidesMesh.receiveShadow = true;
+
         this.sandGroup.position.set(0, y + this.properties.sandHeight, 0);
 
         this.app.scene.add(this.sandGroup);

@@ -125,6 +125,9 @@ export class MyFish {
     this.mesh = new THREE.Mesh(bodyGeometry, material);
     this.fishGroup.add(this.mesh);
 
+    this.mesh.castShadow = true;
+    this.mesh.receiveShadow = true;
+
     const dorsalFin = this._createFin(topPts, this._createCurve(fins.dorsal), true);
     const rectFin = this._createFin(bottomPts, this._createCurve(fins.rectal), false);
     const pelvicFin = this._createFin(bottomPts, this._createCurve(fins.pelvic), false);

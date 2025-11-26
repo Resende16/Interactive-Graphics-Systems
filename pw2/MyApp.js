@@ -42,6 +42,7 @@ class MyApp {
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(this.renderer.domElement);
 
         // --- Cameras ---
@@ -67,6 +68,30 @@ class MyApp {
 
         // --- Resize inicial ---
         this.cameras.resize();
+
+        const ambient = new THREE.HemisphereLight(
+            0x74c7ff,  
+            0x0a1a33,  
+            0.7        
+        );
+        this.scene.add(ambient);
+
+        const sunLight = new THREE.DirectionalLight(0x89c6ff, 3.5);
+        sunLight.position.set(0, this.cubeSize * 2, this.cubeSize * 0.5);
+
+        sunLight.castShadow = true;
+        sunLight.shadow.mapSize.width = 2048;
+        sunLight.shadow.mapSize.height = 2048;
+
+        sunLight.shadow.camera.near = 1;
+        sunLight.shadow.camera.far = this.cubeSize * 6;
+        sunLight.shadow.camera.left = -this.cubeSize;
+        sunLight.shadow.camera.right = this.cubeSize;
+        sunLight.shadow.camera.top = this.cubeSize;
+        sunLight.shadow.camera.bottom = -this.cubeSize;
+
+        this.scene.add(sunLight);
+        this.sunLight = sunLight;
 
         this.animate();
     }

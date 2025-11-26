@@ -160,6 +160,16 @@ class MySubmarine {
         const light = new THREE.SpotLight(0xffffff, 2.0, s * 1.0, Math.PI / 7, 0.4);
         light.position.set(0, 0, -bodyLength * 0.62);
 
+        light.castShadow = true;
+        light.shadow.mapSize.set(1024, 1024);
+
+        light.shadow.camera.near = 0.5;
+        light.shadow.camera.far = this.cubeSize * 1.5;
+        light.shadow.camera.fov = 30;
+
+        light.penumbra = 0.35;
+        light.decay = 1.2;
+
         const target = new THREE.Object3D();
         target.position.set(0, 0, -s * 0.50);
         this.group.add(target);
@@ -168,6 +178,22 @@ class MySubmarine {
         light.visible = false;
         this.headlight = light;
         this.group.add(light);
+
+
+        const frontLight = new THREE.SpotLight(0xffdd88, 2.2, this.cubeSize * 0.9, Math.PI / 6, 0.45);
+        frontLight.position.set( bodyLength * 0.3, 0, 0 ); 
+        frontLight.castShadow = true;
+        frontLight.shadow.mapSize.set(1024, 1024);
+
+        const targetObj = new THREE.Object3D();
+        targetObj.position.set( bodyLength, -this.cubeSize * 0.15, 0 );
+        this.group.add(targetObj);
+        frontLight.target = targetObj;
+
+        this.group.add(frontLight);
+        this.frontLight = frontLight;
+
+        
     }
 
     _onKeyDown(e) {
