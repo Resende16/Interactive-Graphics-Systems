@@ -244,6 +244,16 @@ class MyFloor {
             this.material.dispose();
         }
     }
+
+    setWireframeAll(value) {
+    if (!this.sandGroup) return;
+    this.sandGroup.traverse(o => {
+      if (o.isMesh && o.material) {
+        o.material.wireframe = value;
+        o.material.needsUpdate = true;
+      }
+    });
+  }
 }
 
 export { MyFloor };

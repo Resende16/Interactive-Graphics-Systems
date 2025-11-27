@@ -125,7 +125,6 @@ class MyGuiInterface {
 
 
         }
-     
         const forest = this.contents.MycoralForest; 
         const wireframeParams = { showWireframe: false };
         const myRocks = this.contents.rock;
@@ -136,6 +135,7 @@ class MyGuiInterface {
                 forest.setWireframeAll(value); 
                 myRocks.setWireframeAll(value);
                 this.contents.setPlantsWireframe(value);
+                floor.setWireframeAll(value);
                 
             });
 
