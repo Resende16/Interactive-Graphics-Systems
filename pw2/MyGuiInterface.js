@@ -87,7 +87,7 @@ class MyGuiInterface {
             
             const floorFolder = this.datgui.addFolder('Sand Floor');
             
-            floorFolder.add(floorProperties, 'heightVariation', 0.0, 2.0, 0.1)
+            floorFolder.add(floorProperties, 'heightVariation', 0.0, 1, 0.01)
                 .name('Height Variation')
                 .onChange(() => {
                     floor.updateIrregularity();
