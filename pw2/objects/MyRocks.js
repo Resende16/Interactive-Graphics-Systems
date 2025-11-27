@@ -7,6 +7,7 @@ class MyRocks {
     this.group = null;
     this.parts = [];
     this.cubeSize = cubeSize;
+    this.material = null;
 
     this.properties = {
       diffuseColor: "#796e63",
@@ -65,6 +66,7 @@ class MyRocks {
       transparent: this.properties.transparency < 1.0,
       opacity: this.properties.transparency
     });
+    this.material = material;
 
     const R = this.cubeSize * 0.16;  
     const centers = [
@@ -146,6 +148,17 @@ class MyRocks {
   }
 
   getProperties() { return this.properties; }
+
+
+ setWireframeAll(value) {
+    if (!this.group) return;
+    this.group.traverse(o => {
+      if (o.isMesh && o.material) {
+        o.material.wireframe = value;
+        o.material.needsUpdate = true;
+      }
+    });
+  }
 
   dispose() {
     if (!this.group) return;

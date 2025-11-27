@@ -18,6 +18,14 @@ class MyGuiInterface {
         this.contents = contents;
     }
 
+    setPlantsWireframe(value) {
+  if (!this.plants) return;
+  this.plants.forEach(plant => {
+    plant.setWireframeAll(value);
+  });
+}
+
+
     init() {
         if (!this.contents) return;
 
@@ -117,14 +125,18 @@ class MyGuiInterface {
 
 
         }
+     
         const forest = this.contents.MycoralForest; 
         const wireframeParams = { showWireframe: false };
-
+        const myRocks = this.contents.rock;
         const forestFolder = this.datgui.addFolder('Coral Forest');
         forestFolder.add(wireframeParams, 'showWireframe')
             .name('Wireframe Mode')
             .onChange(value => {
                 forest.setWireframeAll(value); 
+                myRocks.setWireframeAll(value);
+                this.contents.setPlantsWireframe(value);
+                
             });
 
 

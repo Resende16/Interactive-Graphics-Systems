@@ -28,7 +28,7 @@ class MyContents {
         this.cubeSize = 15;
         this.corals = []
         this.forbidden = []
-        this.MycoralForest=null
+        this.MycoralForest = null
         this.groups = {};
 
     }
@@ -57,7 +57,7 @@ class MyContents {
         this.rock = new MyRocks(this.app, this.cubeSize);
         this.rock.init();
 
-        
+
         this.createFishes();
 
         // Submarino
@@ -87,7 +87,7 @@ class MyContents {
             new THREE.Vector3(0, 0, -4),
             new THREE.Vector3(-2, 0, 4),
         ];
-        const forest = new MycoralForest(this.app, 0xff7799, 5); 
+        const forest = new MycoralForest(this.app, 0xff7799, 5);
         const forestGroup = forest.createForest(-6, coralPositions);
         this.MycoralForest = forest;
         this.groups.corals.add(forestGroup);
@@ -119,10 +119,10 @@ class MyContents {
             const FishClass = (i % 3 === 0) ? MyFish2 : MyFish;
 
             const fish = new FishClass(this.app, {
-            showCurves: false,
-            swimSpeed: speed,
-            swimAmplitude: 0.20,
-            turnSmoothness: 0.05
+                showCurves: false,
+                swimSpeed: speed,
+                swimAmplitude: 0.20,
+                turnSmoothness: 0.05
             });
 
             fish.init();
@@ -136,7 +136,7 @@ class MyContents {
 
             this.fishes.push(fish);
         }
-        }
+    }
 
 
     createFishSchool() {
@@ -150,8 +150,9 @@ class MyContents {
         this.fishes.push(this.schoolLeader);
 
         for (let i = 0; i < 6; i++) {
-            const follower = new MyFish(this.app, {showCurves: false,
-            swimSpeed: 0.9
+            const follower = new MyFish(this.app, {
+                showCurves: false,
+                swimSpeed: 0.9
             });
             follower.init();
             follower.fishGroup.scale.setScalar(s * 0.02);
@@ -161,7 +162,14 @@ class MyContents {
 
             this.fishes.push(follower);
         }
-        }
+    }
+
+    setPlantsWireframe(value) {
+        if (!this.plants) return;
+        this.plants.forEach(plant => {
+            plant.setWireframeAll(value);
+        });
+    }
 
     update() {
         const delta = this.app.clock.getDelta();
@@ -177,6 +185,7 @@ class MyContents {
             this.submarine.update();
         }
     }
+
 
     getCube() {
         return this.cube;

@@ -1,6 +1,6 @@
 // Plant.js
 import * as THREE from 'three';
-import { createLeafGeometry } from './MyLeaf.js';
+import { createLeafGeometry } from '../objects/MyLeaf.js';
 
 
 class Plant {
@@ -104,6 +104,7 @@ class Plant {
 
         this.app.scene.add(this.group);
     }
+    
 
     dispose() {
         if (!this.group) return;
@@ -111,6 +112,16 @@ class Plant {
         this.group.traverse(o => { if (o.isMesh) { o.geometry.dispose(); o.material.dispose(); } });
         this.group = null;
     }
+    
+    setWireframeAll(value) {
+    if (!this.group) return;
+    this.group.traverse(o => {
+      if (o.isMesh && o.material) {
+        o.material.wireframe = value;
+        o.material.needsUpdate = true;
+      }
+    });
+  }
 }
 
 export { Plant };
