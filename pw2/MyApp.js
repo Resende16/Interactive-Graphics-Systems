@@ -63,9 +63,7 @@ class MyApp {
         this.axis = new THREE.AxesHelper(5);
         this.scene.add(this.axis);
 
-        // (NÃO criamos MyContents nem MyGuiInterface aqui;
-        //  isso é feito em main.js e ligado com setContents)
-
+  
         // --- Resize inicial ---
         this.cameras.resize();
 

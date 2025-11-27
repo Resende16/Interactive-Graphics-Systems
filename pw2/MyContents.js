@@ -11,6 +11,7 @@ import { MyFish } from './objects/MyFish.js';
 import { MyFish2 } from './objects/MyFish2.js';
 import { MySubmarine } from './objects/MySubmarine.js';
 import { MycoralForest } from './objects/MyCoralForest.js';
+
 class MyContents {
     constructor(app) {
         this.app = app;
@@ -27,6 +28,7 @@ class MyContents {
         this.cubeSize = 15;
         this.corals = []
         this.forbidden = []
+        this.MycoralForest=null
         this.groups = {};
 
     }
@@ -78,7 +80,6 @@ class MyContents {
         });
         this.bubbles.init();
 
-
         const coralPositions = [
             new THREE.Vector3(4, 0, 2),
             new THREE.Vector3(-1, 0, -6),
@@ -88,7 +89,7 @@ class MyContents {
         ];
         const forest = new MycoralForest(this.app, 0xff7799, 5); 
         const forestGroup = forest.createForest(-6, coralPositions);
-
+        this.MycoralForest = forest;
         this.groups.corals.add(forestGroup);
 
     }

@@ -8,11 +8,6 @@ export class MyCoral {
         this.material = null; 
     }
 
-    init() {
-        const coral = this.createCoral(4);
-        this.app.scene.add(coral);
-        return coral;
-    }
 
     chooseRule(options) {
         const total = options.reduce((sum, o) => sum + o.prob, 0);
@@ -102,7 +97,7 @@ export class MyCoral {
         }
 
         const group = new THREE.Group();
-        const geo = new THREE.CylinderGeometry(0.028, 0.045, 1, 6);
+        const geo = new THREE.CylinderGeometry(0.028, 0.045, 1, 6, 1, true);
         geo.translate(0, 0.5, 0);
 
         const mat = new THREE.MeshStandardMaterial({
