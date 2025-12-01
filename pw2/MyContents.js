@@ -64,12 +64,9 @@ class MyContents {
         this.submarine.init();
 
         // Sea star
-        this.seaStar = new MySeaStar(this.app, this.cubeSize, {
-            armLength: this.cubeSize * 0.18,   // antes ~0.28
-            armBaseRadius: this.cubeSize * 0.022,
-            armTipRadius: this.cubeSize * 0.006
-        });
-        this.seaStar.init(new THREE.Vector3(this.cubeSize * 0.08, 0.25, this.cubeSize * 0.2));
+        this.seaStar = new MySeaStar(this.app, this.cubeSize);
+        const floorTopY = this.floor.getTopY();
+        this.seaStar.init(new THREE.Vector3(2, floorTopY + 0.9, 4));
 
         this.bubbles = new MyBubbles(this.app, this.cubeSize, {
             // podes afinar estes:

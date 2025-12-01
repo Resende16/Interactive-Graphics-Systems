@@ -234,6 +234,10 @@ class MyFloor {
         return this.properties;
     }
 
+    getTopY() {
+        return this.sandGroup.position.y;
+    }
+
     dispose() {
         if (this.sandGroup) {
             this.app.scene.remove(this.sandGroup);
