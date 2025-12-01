@@ -1,6 +1,7 @@
 // Plant.js
 import * as THREE from 'three';
 import { createLeafGeometry } from '../objects/MyLeaf.js';
+import { WaveShader } from "../shaders/MyWaveShader.js";
 
 
 class Plant {
@@ -72,23 +73,35 @@ class Plant {
                 const x = Math.cos(a) * xzRadius;
                 const z = Math.sin(a) * xzRadius;
 
-                const leaf = new THREE.Mesh(leafGeo, leafMat.clone());
+                const shaderMat = new THREE.ShaderMaterial({
+                    uniforms: THREE.UniformsUtils.clone(WaveShader.uniforms),
+                    vertexShader: WaveShader.vertexShader,
+                    fragmentShader: WaveShader.fragmentShader
+                });
 
-                leaf.material.color
-                .set(this.options.leafColor)
-                .lerp(new THREE.Color(this.options.leafEdgeColor), 0.12);
+                // permitir UVs e textura
+                shaderMat.defines = { USE_UV: "" };
+                shaderMat.uniforms.map.value = leafTex;
+                shaderMat.uniforms.useMap.value = true;
 
+                // definir cor real das folhas
                 const base = new THREE.Color(this.options.leafColor);
                 const edge = new THREE.Color(this.options.leafEdgeColor);
-                leaf.material.color.lerpColors(base, edge, 0.15 + 0.15 * Math.random());
+                shaderMat.uniforms.baseColor.value = base.clone().lerp(edge, 0.2);
+                shaderMat.needsUpdate = true;
+
+                // Leaf mesh
+                const leaf = new THREE.Mesh(leafGeo, shaderMat);
 
                 leaf.scale.setScalar(scale * (0.85 + Math.random()*0.15));
                 leaf.position.set(x, y, z);
-
                 leaf.lookAt(new THREE.Vector3(0, y + this.options.leafLength * 0.4, 0));
                 leaf.rotateX(-Math.PI/2);
                 leaf.rotateZ((Math.random()-0.5) * this.options.randomTilt);
                 leaf.rotateY((Math.random()-0.5) * this.options.randomTilt);
+                
+                if (!this.shaderUniforms) this.shaderUniforms = [];
+                this.shaderUniforms.push(shaderMat.uniforms);
 
                 this.group.add(leaf);
             }

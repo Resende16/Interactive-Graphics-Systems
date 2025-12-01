@@ -25,37 +25,32 @@ class MyContents {
         this.plants = [];
         this.fishes = [];
         this.cubeSize = 15;
-        this.corals = []
-        this.forbidden = []
-        this.MycoralForest = null
+        this.corals = [];
+        this.forbidden = [];
+        this.MycoralForest = null;
         this.groups = {};
-
     }
 
     init() {
-
-
         this.groups.corals = new THREE.Group();
         this.app.scene.add(this.groups.corals);
+        
         this.panorama = new MyPanorama(this.app, this.cubeSize);
         this.panorama.init();
 
         // Create the Floor first (so it appears behind everything)
         this.floor = new MyFloor(this.app, this.cubeSize);
-
         this.floor.init();
 
         this.createPlants();
 
         // Create and Centralize the Cube (Aquarium)
         this.cube = new MyCube(this.app, this.cubeSize);
-
         this.cube.init();
 
         // Create Rock
         this.rock = new MyRocks(this.app, this.cubeSize);
         this.rock.init();
-
 
         this.createFishes();
 
@@ -69,7 +64,7 @@ class MyContents {
         this.seaStar.init(new THREE.Vector3(2, floorTopY + 0.9, 4));
 
         this.bubbles = new MyBubbles(this.app, this.cubeSize, {
-            // podes afinar estes:
+            // You can adjust these:
             // spawnPerSecond: 8,
             // radiusMin: this.cubeSize * 0.009,
             // radiusMax: this.cubeSize * 0.016
@@ -83,11 +78,11 @@ class MyContents {
             new THREE.Vector3(0, 0, -4),
             new THREE.Vector3(-2, 0, 4),
         ];
+        
         const forest = new MycoralForest(this.app, 0xff7799, 5);
         const forestGroup = forest.createForest(-6, coralPositions);
         this.MycoralForest = forest;
         this.groups.corals.add(forestGroup);
-
     }
 
     createPlants() {
@@ -134,7 +129,6 @@ class MyContents {
         }
     }
 
-
     createFishSchool() {
         const s = this.cubeSize;
 
@@ -168,6 +162,7 @@ class MyContents {
     }
 
     update() {
+        const t = performance.now() * 0.001;
         const delta = this.app.clock.getDelta();
 
         if (this.bubbles) this.bubbles.update();
@@ -184,8 +179,19 @@ class MyContents {
         if (this.seaStar) {
             this.seaStar.update(delta, this.cubeSize);
         }
-    }
 
+        // Update plant shaders
+        if (this.plants) {
+            for (const p of this.plants) {
+                if (p.shaderUniforms) {
+                    for (const uniforms of p.shaderUniforms) {
+                        uniforms.time.value = t;
+                    }
+                }
+            }
+        }
+
+    }
 
     getCube() {
         return this.cube;
@@ -202,10 +208,10 @@ class MyContents {
     getPanorama() {
         return this.panorama;
     }
+    
     getSeaStar() {
         return this.seaStar;
     }
-
 }
 
 export { MyContents };

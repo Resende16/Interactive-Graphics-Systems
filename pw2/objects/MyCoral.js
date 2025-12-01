@@ -8,7 +8,6 @@ export class MyCoral {
         this.material = null; 
     }
 
-
     chooseRule(options) {
         const total = options.reduce((sum, o) => sum + o.prob, 0);
         let r = Math.random() * total;
@@ -105,9 +104,11 @@ export class MyCoral {
             roughness: 0.9,
             metalness: 0.1
         });
+
         this.material = mat;
 
         const mesh = new THREE.InstancedMesh(geo, mat, branches.length);
+
         branches.forEach((m, i) => mesh.setMatrixAt(i, m));
         group.add(mesh);
 
