@@ -24,7 +24,6 @@ class MyContents {
         this.submarine = null;
         this.plants = [];
         this.fishes = [];
-        this.cubeSize = 150;
         this.cubeSize = 15;
         this.corals = []
         this.forbidden = []
@@ -183,6 +182,10 @@ class MyContents {
 
         if (this.submarine) {
             this.submarine.update();
+        }
+
+        if (this.seaStar) {
+            this.seaStar.update(delta, this.cubeSize);
         }
     }
 

@@ -68,8 +68,8 @@ class MyCube {
     }
 
     updateVisibility() {
-        if (this.cube) {
-            this.cube.visible = this.properties.visible;
+        if (this.mesh) {
+            this.mesh.visible = this.properties.visible;
         }
     }
 

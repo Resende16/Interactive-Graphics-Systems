@@ -8,10 +8,10 @@ class MySeaStar {
 
     this.options = Object.assign({
       arms: 5,
-      armLength: cubeSize * 0.28,
-      armBaseRadius: cubeSize * 0.035,
-      armTipRadius:  cubeSize * 0.008,
-      thickness: 0.28,
+      armLength: cubeSize * 0.10,
+      armBaseRadius: cubeSize * 0.010,
+      armTipRadius:  cubeSize * 0.003,
+      thickness: 0.15,
       segmentsPerArm: 10,
       curveUp: cubeSize * 0.025,
       twist: 0.15,
@@ -34,7 +34,7 @@ class MySeaStar {
     });
 
     const bodyRadius = o.armBaseRadius * 1.6;
-    const bodyGeo = new THREE.SphereGeometry(bodyRadius, 24, 16);
+    const bodyGeo = new THREE.SphereGeometry(bodyRadius, 12, 8);
     bodyGeo.scale(1, o.thickness, 1);
     const body = new THREE.Mesh(bodyGeo, baseMat.clone());
     body.castShadow = body.receiveShadow = true;
@@ -102,6 +102,23 @@ class MySeaStar {
     });
     this.group = null;
   }
+
+  update(delta, cubeSize) {
+      if (!this.group) return;
+
+      const speed = cubeSize * 0.02;  
+
+      this.group.position.x += Math.sin(performance.now() * 0.0002) * speed * delta;
+      this.group.position.z += Math.cos(performance.now() * 0.00025) * speed * delta;
+
+      this.group.rotation.y += 0.1 * delta;
+
+      const limit = cubeSize * 0.45;
+      this.group.position.x = THREE.MathUtils.clamp(this.group.position.x, -limit, limit);
+      this.group.position.z = THREE.MathUtils.clamp(this.group.position.z, -limit, limit);
+  }
+
 }
+
 
 export { MySeaStar };
