@@ -11,6 +11,8 @@ import { MyFish } from './objects/MyFish.js';
 import { MyFish2 } from './objects/MyFish2.js';
 import { MySubmarine } from './objects/MySubmarine.js';
 import { MycoralForest } from './objects/MyCoralForest.js';
+import { MyShark } from './objects/MyShark.js';
+
 
 class MyContents {
     constructor(app) {
@@ -24,6 +26,7 @@ class MyContents {
         this.submarine = null;
         this.plants = [];
         this.fishes = [];
+        this.sharks = [];
         this.cubeSize = 15;
         this.corals = [];
         this.forbidden = [];
@@ -53,6 +56,9 @@ class MyContents {
         this.rock.init();
 
         this.createFishes();
+
+        this.createSharks();
+
 
         // Submarino
         this.submarine = new MySubmarine(this.app, this.cubeSize);
@@ -129,6 +135,31 @@ class MyContents {
         }
     }
 
+    createSharks() {
+        const numSharks = 2;
+        const s = this.cubeSize;
+
+        for (let i = 0; i < numSharks; i++) {
+            const shark = new MyShark(this.app, {
+            showCurves: false,
+            swimSpeed: 1.1,
+            turnSmoothness: 0.04,
+            swimAmplitude: 0.18,
+            });
+
+            shark.init();
+
+            shark.fishGroup.position.x = THREE.MathUtils.randFloat(-s * 0.5, s * 0.5);
+            shark.fishGroup.position.y = THREE.MathUtils.randFloat(-s * 0.2, s * 0.3);
+            shark.fishGroup.position.z = THREE.MathUtils.randFloat(-s * 0.5, s * 0.5);
+
+            shark.fishGroup.scale.setScalar(s * 0.010);
+
+            this.sharks.push(shark);
+        }
+        }
+
+
     createFishSchool() {
         const s = this.cubeSize;
 
@@ -171,6 +202,9 @@ class MyContents {
 
         for (const f of this.fishes)
             f.update(delta, this.cubeSize);
+
+        for (const shark of this.sharks)
+            shark.update(delta, this.cubeSize);
 
         if (this.submarine) {
             this.submarine.update();
