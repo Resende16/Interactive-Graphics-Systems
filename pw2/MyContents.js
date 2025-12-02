@@ -55,6 +55,22 @@ class MyContents {
         this.rock = new MyRocks(this.app, this.cubeSize);
         this.rock.init();
 
+        const extraRockPositions = [
+        new THREE.Vector3(-4, -5.5, 6),
+        new THREE.Vector3(-0, -5.5, 0),
+        new THREE.Vector3(5, -5.5, 0),
+        ];
+
+        this.extraRocks = [];
+
+        for (const pos of extraRockPositions) {
+        const r = new MyRocks(this.app, this.cubeSize);
+        r.init();                          
+        r.group.position.copy(pos);        
+        r.group.scale.multiplyScalar(0.25); 
+        this.extraRocks.push(r);
+        }
+
         this.createFishes();
 
         this.createSharks();
@@ -83,6 +99,10 @@ class MyContents {
             new THREE.Vector3(-6, 0, -2),
             new THREE.Vector3(0, 0, -4),
             new THREE.Vector3(-2, 0, 4),
+            new THREE.Vector3(5, 0, -5),
+            new THREE.Vector3(-5, 0, 5),
+            new THREE.Vector3(1.5, 0, 5.5),
+            new THREE.Vector3(-4.5, 0, 0),
         ];
         
         const forest = new MycoralForest(this.app, 0xff7799, 5);
@@ -142,7 +162,7 @@ class MyContents {
         for (let i = 0; i < numSharks; i++) {
             const shark = new MyShark(this.app, {
             showCurves: false,
-            swimSpeed: 1.1,
+            swimSpeed: 0.25,
             turnSmoothness: 0.04,
             swimAmplitude: 0.18,
             });
@@ -153,7 +173,7 @@ class MyContents {
             shark.fishGroup.position.y = THREE.MathUtils.randFloat(-s * 0.2, s * 0.3);
             shark.fishGroup.position.z = THREE.MathUtils.randFloat(-s * 0.5, s * 0.5);
 
-            shark.fishGroup.scale.setScalar(s * 0.010);
+            shark.fishGroup.scale.setScalar(s * 0.0085);
 
             this.sharks.push(shark);
         }
