@@ -12,6 +12,7 @@ import { MyFish2 } from './objects/MyFish2.js';
 import { MySubmarine } from './objects/MySubmarine.js';
 import { MycoralForest } from './objects/MyCoralForest.js';
 import { MyShark } from './objects/MyShark.js';
+import { MyTurtle } from './objects/MyTurtle.js';
 
 
 class MyContents {
@@ -31,6 +32,7 @@ class MyContents {
         this.corals = [];
         this.forbidden = [];
         this.MycoralForest = null;
+        this.turtle = null;
         this.groups = {};
     }
 
@@ -79,6 +81,10 @@ class MyContents {
         // Submarino
         this.submarine = new MySubmarine(this.app, this.cubeSize);
         this.submarine.init();
+
+        // Turtle
+        this.turtle = new MyTurtle(this.app, this.cubeSize);
+        this.turtle.init();
 
         // Sea star
         this.seaStar = new MySeaStar(this.app, this.cubeSize);
@@ -228,6 +234,10 @@ class MyContents {
 
         if (this.submarine) {
             this.submarine.update();
+        }
+
+        if (this.turtle) {
+            this.turtle.update(delta, this.cubeSize);
         }
 
         if (this.seaStar) {

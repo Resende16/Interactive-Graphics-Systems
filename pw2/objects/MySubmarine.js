@@ -124,7 +124,7 @@ class MySubmarine {
         });
         const warningLight = new THREE.Mesh(warningLightGeo, warningLightMat);
 
-        warningLight.position.set(0.17, radius * 0.015, radius * 0 );
+        warningLight.position.set(0.13, radius * 0.015, radius * 0 );
 
         head.add(warningLight);     
 
