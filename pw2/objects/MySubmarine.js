@@ -9,7 +9,7 @@ class MySubmarine {
         this.group = new THREE.Group();
 
         // movimento
-        this.speed = cubeSize * 0.25;
+        this.speed = cubeSize * 0.10;
         this.turnSpeed = 1.4;
         this.keys = new Set();
 
@@ -41,8 +41,8 @@ class MySubmarine {
     _buildGeometry() {
         const s = this.cubeSize;
 
-        const radius = s * 0.04;
-        const bodyLength = s * 0.3;
+        const radius = s * 0.03;
+        const bodyLength = s * 0.20;
 
         const bodyMat = new THREE.MeshStandardMaterial({
             color: 0x6b635b,
@@ -102,6 +102,7 @@ class MySubmarine {
         pipe.position.set(-0.5, radius * 2.0, -bodyLength * 0.1);
         pipe.position.y = bodyLength * 0.1;
         pipe.position.z = bodyLength * 0;
+        pipe.position.x = bodyLength * (-0.02);
         this.group.add(pipe);
 
         // cabeçote do periscópio
@@ -112,6 +113,23 @@ class MySubmarine {
         head.position.y = bodyLength * 0.25;
 
         this.group.add(head);
+
+        const warningLightGeo = new THREE.SphereGeometry(radius * 0.07, 12, 12);
+        const warningLightMat = new THREE.MeshStandardMaterial({
+        color: 0xff0000,
+        emissive: 0xff0000,
+        emissiveIntensity: 0.0,   // começa apagada
+        metalness: 0.2,
+        roughness: 0.4
+        });
+        const warningLight = new THREE.Mesh(warningLightGeo, warningLightMat);
+
+        warningLight.position.set(0.13, radius * 0.015, radius * 0 );
+
+        head.add(warningLight);     
+
+        this.warningLight = warningLight;
+        this.warningLightPhase = 0;
 
         // helice para colocar na parte de trás do submarino
 
@@ -223,6 +241,17 @@ class MySubmarine {
         const forward = new THREE.Vector3(1, 0, 0).applyQuaternion(this.group.quaternion);      
         if (this.keys.has("KeyW")) this.group.position.addScaledVector(forward, move);
         if (this.keys.has("KeyS")) this.group.position.addScaledVector(forward, -move);
+
+        if (this.warningLight) {
+            this.warningLightPhase += dt * 2 * Math.PI * 2; 
+            const blink = (Math.sin(this.warningLightPhase) + 1) / 2; 
+
+            const minIntensity = 0.1;
+            const maxIntensity = 2.5;
+            const intensity = minIntensity + blink * (maxIntensity - minIntensity);
+
+            this.warningLight.material.emissiveIntensity = intensity;
+        }
 
         this._stayInsideAquarium();
     }

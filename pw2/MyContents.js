@@ -12,6 +12,7 @@ import { MyFish2 } from './objects/MyFish2.js';
 import { MySubmarine } from './objects/MySubmarine.js';
 import { MycoralForest } from './objects/MyCoralForest.js';
 import { MyShark } from './objects/MyShark.js';
+import { MyTurtle } from './objects/MyTurtle.js';
 
 
 class MyContents {
@@ -31,6 +32,7 @@ class MyContents {
         this.corals = [];
         this.forbidden = [];
         this.MycoralForest = null;
+        this.turtle = null;
         this.groups = {};
     }
 
@@ -55,6 +57,22 @@ class MyContents {
         this.rock = new MyRocks(this.app, this.cubeSize);
         this.rock.init();
 
+        const extraRockPositions = [
+        new THREE.Vector3(-4, -5.5, 6),
+        new THREE.Vector3(-0, -5.5, 0),
+        new THREE.Vector3(5, -5.5, 0),
+        ];
+
+        this.extraRocks = [];
+
+        for (const pos of extraRockPositions) {
+        const r = new MyRocks(this.app, this.cubeSize);
+        r.init();                          
+        r.group.position.copy(pos);        
+        r.group.scale.multiplyScalar(0.25); 
+        this.extraRocks.push(r);
+        }
+
         this.createFishes();
 
         this.createSharks();
@@ -63,6 +81,10 @@ class MyContents {
         // Submarino
         this.submarine = new MySubmarine(this.app, this.cubeSize);
         this.submarine.init();
+
+        // Turtle
+        this.turtle = new MyTurtle(this.app, this.cubeSize);
+        this.turtle.init();
 
         // Sea star
         this.seaStar = new MySeaStar(this.app, this.cubeSize);
@@ -83,6 +105,10 @@ class MyContents {
             new THREE.Vector3(-6, 0, -2),
             new THREE.Vector3(0, 0, -4),
             new THREE.Vector3(-2, 0, 4),
+            new THREE.Vector3(5, 0, -5),
+            new THREE.Vector3(-5, 0, 5),
+            new THREE.Vector3(1.5, 0, 5.5),
+            new THREE.Vector3(-4.5, 0, 0),
         ];
         
         const forest = new MycoralForest(this.app, 0xff7799, 5);
@@ -142,7 +168,7 @@ class MyContents {
         for (let i = 0; i < numSharks; i++) {
             const shark = new MyShark(this.app, {
             showCurves: false,
-            swimSpeed: 1.1,
+            swimSpeed: 0.25,
             turnSmoothness: 0.04,
             swimAmplitude: 0.18,
             });
@@ -153,7 +179,7 @@ class MyContents {
             shark.fishGroup.position.y = THREE.MathUtils.randFloat(-s * 0.2, s * 0.3);
             shark.fishGroup.position.z = THREE.MathUtils.randFloat(-s * 0.5, s * 0.5);
 
-            shark.fishGroup.scale.setScalar(s * 0.010);
+            shark.fishGroup.scale.setScalar(s * 0.0085);
 
             this.sharks.push(shark);
         }
@@ -208,6 +234,10 @@ class MyContents {
 
         if (this.submarine) {
             this.submarine.update();
+        }
+
+        if (this.turtle) {
+            this.turtle.update(delta, this.cubeSize);
         }
 
         if (this.seaStar) {
