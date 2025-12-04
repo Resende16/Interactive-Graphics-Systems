@@ -6,6 +6,10 @@ class MyTurtle {
     this.app = app;
     this.cubeSize = cubeSize;
     this.group = new THREE.Group();
+
+    this.speed = 0.15;                            
+    this.direction = new THREE.Vector3(1, 0.5, 0.3).normalize(); 
+    this.bounds = cubeSize * 0.45; 
   }
 
   init() {
@@ -13,28 +17,30 @@ class MyTurtle {
     this.app.scene.add(this.group);
 
     const s = this.cubeSize;
-    const bottom = -s / 2 + s / 10;
-    const top = s / 2;
-    this.group.position.set(5, -(bottom + top) * 0.005, 5); 
-    this.group.scale.setScalar(s * 0.01);   
+    this.group.position.set(5, 0, 5);
+    this.group.scale.setScalar(s * 0.05); 
     
-    this.group.rotation.z = -Math.PI * 0.08;   
-    this.group.rotation.y =  Math.PI * 0.25;
+    const targetPos = this.group.position.clone().add(this.direction);
+    this.group.lookAt(targetPos);
   }
 
   _buildGeometry() {
-    const s = this.cubeSize;
-    const shellRadius = s * 0.16;
+    const shellRadius = 1; 
+
+    const textureLoader = new THREE.TextureLoader();
+    const shellTexture = textureLoader.load('textures/turtle.jpg');
+    shellTexture.wrapS = THREE.RepeatWrapping;
+    shellTexture.wrapT = THREE.RepeatWrapping;
 
     const matShell = new THREE.MeshStandardMaterial({
-        color: 0xc88f56,
+        map: shellTexture,
         metalness: 0.1,
         roughness: 0.85,
-        flatShading: true
+        flatShading: true,
     });
 
     const matBody = new THREE.MeshStandardMaterial({
-        color: 0x6b8e23,
+        color: 0x385233,
         metalness: 0.1,
         roughness: 0.9,
         flatShading: true
@@ -141,9 +147,33 @@ class MyTurtle {
     this.group.add(tail);
   }
 
-    update(delta, cubeSize) {
-        this.group.rotation.y += delta * 0.1;
+  update(delta) {
+    const moveStep = this.speed * delta;
+    const forward = this.direction.clone().normalize();
+    
+    this.group.position.addScaledVector(forward, moveStep);
+
+    const b = this.bounds;
+    const p = this.group.position;
+
+    if (p.x > b || p.x < -b) {
+      this.direction.x *= -1;
+      p.x = Math.max(-b, Math.min(b, p.x));
     }
+
+    if (p.y > b || p.y < -b) {
+      this.direction.y *= -1;
+      p.y = Math.max(-b, Math.min(b, p.y));
+    }
+
+    if (p.z > b || p.z < -b) {
+      this.direction.z *= -1;
+      p.z = Math.max(-b, Math.min(b, p.z));
+    }
+
+    const targetPos = this.group.position.clone().add(this.direction);
+    this.group.lookAt(targetPos);
+  }
 }
 
 export { MyTurtle };

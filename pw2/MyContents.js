@@ -237,7 +237,7 @@ class MyContents {
         }
 
         if (this.turtle) {
-            this.turtle.update(delta, this.cubeSize);
+            this.turtle.update(delta);
         }
 
         if (this.seaStar) {
