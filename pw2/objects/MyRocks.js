@@ -15,8 +15,9 @@ class MyRocks {
       heightRatio: 0.40,
       xzOffsetRatio: { x: -0.25, z: -0.25 },
       scale: 1.0,
-      texturePath: "./textures/rock.jpg",
-      detail: 1,              
+      texturePath: "textures/rocha.jpg",
+      bumpPath: "textures/rocha.jpg",
+      detail: 2,              
       noiseAmplitude: 0.18,  
       partsCount: 8           
     };
@@ -52,14 +53,28 @@ class MyRocks {
     this.group = new THREE.Group();
 
     const loader = new THREE.TextureLoader();
-    const rockTex = loader.load(this.properties.texturePath);
+    const rockTex = loader.load(this.properties.texturePath || 'textures/rocha.jpg');
     rockTex.colorSpace = THREE.SRGBColorSpace;
     rockTex.wrapS = rockTex.wrapT = THREE.RepeatWrapping;
     rockTex.repeat.set(2.0, 2.0);
 
+    // Use a bump map to simulate fine grooves / cracks on the rock surface
+    const bumpTex = loader.load(this.properties.bumpPath || 'textures/rocha.jpg');
+    bumpTex.wrapS = bumpTex.wrapT = THREE.RepeatWrapping;
+    bumpTex.repeat.set(2.0, 2.0);
+
+    // Displacement map (used to actually displace vertices) - reuse rocha.jpg if no separate map
+    const dispTex = loader.load(this.properties.displacementPath || 'textures/rocha.jpg');
+    dispTex.wrapS = dispTex.wrapT = THREE.RepeatWrapping;
+    dispTex.repeat.set(2.0, 2.0);
+
     const material = new THREE.MeshStandardMaterial({
       color: new THREE.Color(this.properties.diffuseColor),
       map: rockTex,
+      bumpMap: bumpTex,
+      bumpScale: this.properties.bumpScale ?? 0.15,
+      displacementMap: dispTex,
+      displacementScale: this.properties.displacementScale ?? 0.25,
       roughness: 1.0,
       metalness: 0.0,
       flatShading: true,
