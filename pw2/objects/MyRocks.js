@@ -57,16 +57,43 @@ class MyRocks {
     rockTex.colorSpace = THREE.SRGBColorSpace;
     rockTex.wrapS = rockTex.wrapT = THREE.RepeatWrapping;
     rockTex.repeat.set(2.0, 2.0);
+    rockTex.generateMipmaps = true;
+    rockTex.minFilter = THREE.LinearMipmapLinearFilter;
+    rockTex.magFilter = THREE.LinearFilter;
+    try {
+      const maxAniso = this.app?.renderer?.capabilities?.getMaxAnisotropy ? this.app.renderer.capabilities.getMaxAnisotropy() : 1;
+      rockTex.anisotropy = maxAniso || 1;
+    } catch (e) {
+      rockTex.anisotropy = 1;
+    }
 
     // Use a bump map to simulate fine grooves / cracks on the rock surface
     const bumpTex = loader.load(this.properties.bumpPath || 'textures/rocha.jpg');
     bumpTex.wrapS = bumpTex.wrapT = THREE.RepeatWrapping;
     bumpTex.repeat.set(2.0, 2.0);
+    bumpTex.generateMipmaps = true;
+    bumpTex.minFilter = THREE.LinearMipmapLinearFilter;
+    bumpTex.magFilter = THREE.LinearFilter;
+    try {
+      const maxAniso2 = this.app?.renderer?.capabilities?.getMaxAnisotropy ? this.app.renderer.capabilities.getMaxAnisotropy() : 1;
+      bumpTex.anisotropy = maxAniso2 || 1;
+    } catch (e) {
+      bumpTex.anisotropy = 1;
+    }
 
     // Displacement map (used to actually displace vertices) - reuse rocha.jpg if no separate map
     const dispTex = loader.load(this.properties.displacementPath || 'textures/rocha.jpg');
     dispTex.wrapS = dispTex.wrapT = THREE.RepeatWrapping;
     dispTex.repeat.set(2.0, 2.0);
+    dispTex.generateMipmaps = true;
+    dispTex.minFilter = THREE.LinearMipmapLinearFilter;
+    dispTex.magFilter = THREE.LinearFilter;
+    try {
+      const maxAniso3 = this.app?.renderer?.capabilities?.getMaxAnisotropy ? this.app.renderer.capabilities.getMaxAnisotropy() : 1;
+      dispTex.anisotropy = maxAniso3 || 1;
+    } catch (e) {
+      dispTex.anisotropy = 1;
+    }
 
     const material = new THREE.MeshStandardMaterial({
       color: new THREE.Color(this.properties.diffuseColor),

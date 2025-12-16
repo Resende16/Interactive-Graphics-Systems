@@ -1,7 +1,7 @@
 // Plant.js
 import * as THREE from 'three';
 import { createLeafGeometry } from '../objects/MyLeaf.js';
-import { WaveShader } from "../shaders/MyWaveShader.js";
+import { PerlinLeafShader } from "../shaders/PerlinLeafShader.js";
 
 
 class Plant {
@@ -74,9 +74,9 @@ class Plant {
                 const z = Math.sin(a) * xzRadius;
 
                 const shaderMat = new THREE.ShaderMaterial({
-                    uniforms: THREE.UniformsUtils.clone(WaveShader.uniforms),
-                    vertexShader: WaveShader.vertexShader,
-                    fragmentShader: WaveShader.fragmentShader
+                    uniforms: THREE.UniformsUtils.clone(PerlinLeafShader.uniforms),
+                    vertexShader: PerlinLeafShader.vertexShader,
+                    fragmentShader: PerlinLeafShader.fragmentShader
                 });
 
                 // permitir UVs e textura
@@ -84,10 +84,12 @@ class Plant {
                 shaderMat.uniforms.map.value = leafTex;
                 shaderMat.uniforms.useMap.value = true;
 
-                // definir cor real das folhas
+                // set Perlin shader parameters and base color
+                shaderMat.uniforms.scale.value = 2.0 + Math.random() * 1.5;
+                shaderMat.uniforms.intensity.value = 0.18 + Math.random() * 0.12;
+                shaderMat.uniforms.speed.value = 0.2 + Math.random() * 0.2;
                 const base = new THREE.Color(this.options.leafColor);
-                const edge = new THREE.Color(this.options.leafEdgeColor);
-                shaderMat.uniforms.baseColor.value = base.clone().lerp(edge, 0.2);
+                shaderMat.uniforms.baseColor.value = base;
                 shaderMat.needsUpdate = true;
 
                 // Leaf mesh

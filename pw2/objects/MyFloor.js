@@ -78,9 +78,21 @@ class MyFloor {
             (error) => { console.error('Error loading sand texture:', error); }
         );
 
+        // Ensure proper filtering and mipmaps for varied viewing distances
         sandTexture.wrapS = THREE.RepeatWrapping;
         sandTexture.wrapT = THREE.RepeatWrapping;
         sandTexture.repeat.set(this.properties.textureRepeat, this.properties.textureRepeat);
+        sandTexture.generateMipmaps = true;
+        sandTexture.minFilter = THREE.LinearMipmapLinearFilter;
+        sandTexture.magFilter = THREE.LinearFilter;
+        sandTexture.colorSpace = THREE.SRGBColorSpace;
+        // Use renderer capability for anisotropy if available
+        try {
+            const maxAniso = this.app?.renderer?.capabilities?.getMaxAnisotropy ? this.app.renderer.capabilities.getMaxAnisotropy() : 1;
+            sandTexture.anisotropy = maxAniso || 1;
+        } catch (e) {
+            sandTexture.anisotropy = 1;
+        }
 
         this.material = new THREE.MeshStandardMaterial({
             map: sandTexture,
