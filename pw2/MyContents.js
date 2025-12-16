@@ -82,6 +82,11 @@ class MyContents {
         this.submarine = new MySubmarine(this.app, this.cubeSize);
         this.submarine.init();
 
+        // Register submarine camera to GUI
+        if (this.submarine.camera && this.app.cameras) {
+            this.app.cameras.addCamera('Submarine', this.submarine.camera);
+        }
+
         // Turtle
         this.turtle = new MyTurtle(this.app, this.cubeSize);
         this.turtle.init();

@@ -16,6 +16,9 @@ class MySubmarine {
         // luz 
         this.headlight = null;
 
+        this.camera = null;
+        this.cameraOffset = new THREE.Vector3(0, 0, 0);
+
         this._lastTime = performance.now();
 
         // keyboard bindings
@@ -31,6 +34,11 @@ class MySubmarine {
         const bottom = -this.cubeSize / 2 + this.cubeSize / 10;
         const top = this.cubeSize / 2;
         this.group.position.set(0, (bottom + top) * 0.55, 0);
+
+        // Add submarine camera to app cameras
+        if (this.camera && this.app.cameras) {
+            this.app.cameras.cameras['Submarine'] = this.camera;
+        }
 
         // eventos teclado
         window.addEventListener("keydown", this._onKeyDown);
@@ -211,6 +219,10 @@ class MySubmarine {
         this.group.add(frontLight);
         this.frontLight = frontLight;
 
+        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, s * 5);
+        this.cameraOffset.set(bodyLength * 0.35, bodyLength * 0.25, 0);
+        this.camera.isSubmarine = true;
+        this.group.add(this.camera);
         
     }
 
@@ -241,6 +253,12 @@ class MySubmarine {
         // Vertical movement with P (up) and L (down)
         if (this.keys.has("KeyP")) this.group.position.y += move;
         if (this.keys.has("KeyL")) this.group.position.y -= move;
+
+        if (this.camera) {
+            this.camera.position.copy(this.cameraOffset);
+            this.camera.rotation.order = 'YXZ';
+            this.camera.rotation.copy(this.group.rotation);
+        }
 
         if (this.warningLight) {
             this.warningLightPhase += dt * 2 * Math.PI * 2; 

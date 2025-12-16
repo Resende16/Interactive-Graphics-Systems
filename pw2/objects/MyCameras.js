@@ -118,6 +118,10 @@ class MyCameras {
     getCameraNames() {
         return Object.keys(this.cameras);
     }
+
+    addCamera(name, camera) {
+        this.cameras[name] = camera;
+    }
 }
 
 export { MyCameras };
