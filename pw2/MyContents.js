@@ -81,12 +81,19 @@ class MyContents {
 
         this.createSharks();
 
+        if (this.flock) {
+            for (const shark of this.sharks) {
+                this.flock.addDangerousEntity(shark);
+            }
+        }
 
-        // Submarino
         this.submarine = new MySubmarine(this.app, this.cubeSize);
         this.submarine.init();
 
-        // Register submarine camera to GUI
+        if (this.flock) {
+            this.flock.addDangerousEntity(this.submarine);
+        }
+
         if (this.submarine.camera && this.app.cameras) {
             this.app.cameras.addCamera('Submarine', this.submarine.camera);
         }

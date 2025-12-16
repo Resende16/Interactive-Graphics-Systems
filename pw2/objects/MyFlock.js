@@ -14,6 +14,8 @@ export class MyFlock {
     this.alignmentWeight = options.alignmentWeight || 1.0;
     this.cohesionWeight = options.cohesionWeight || 1.0;
     this.boundaryWeight = options.boundaryWeight || 1.0;
+    this.predatorAvoidanceWeight = options.predatorAvoidanceWeight || 2.5;
+    this.dangerousEntities = [];
     this.cubeSize = options.cubeSize || 15;
     this.flockGroup = new THREE.Group();
   }
@@ -58,14 +60,17 @@ export class MyFlock {
       let alignmentForce = this._alignment(fish, neighbors);
       let cohesionForce = this._cohesion(fish, neighbors);
       let boundaryForce = this._avoidBoundaries(fish, cubeSize);
+      let predatorForce = this._avoidPredators(fish);
       separationForce.multiplyScalar(this.separationWeight);
       alignmentForce.multiplyScalar(this.alignmentWeight);
       cohesionForce.multiplyScalar(this.cohesionWeight);
       boundaryForce.multiplyScalar(this.boundaryWeight);
+      predatorForce.multiplyScalar(this.predatorAvoidanceWeight);
       fish.boidAcceleration.add(separationForce);
       fish.boidAcceleration.add(alignmentForce);
       fish.boidAcceleration.add(cohesionForce);
       fish.boidAcceleration.add(boundaryForce);
+      fish.boidAcceleration.add(predatorForce);
       this._limitVector(fish.boidAcceleration, this.maxForce);
       fish.boidVelocity.add(fish.boidAcceleration);
       this._limitVector(fish.boidVelocity, this.maxSpeed);
@@ -73,7 +78,7 @@ export class MyFlock {
       fish.fishGroup.position.x += fish.boidVelocity.x * speed * dt;
       fish.fishGroup.position.y += fish.boidVelocity.y * speed * dt * 0.5;
       fish.fishGroup.position.z += fish.boidVelocity.z * speed * dt;
-      this._wrapBoundaries(fish.fishGroup.position, cubeSize);
+      this._bounceBoundaries(fish.fishGroup.position, fish.boidVelocity, cubeSize);
       if (fish.boidVelocity.length() > 0.01) {
         const targetRotY = Math.atan2(fish.boidVelocity.z, -fish.boidVelocity.x);
         const currentRotY = fish.fishGroup.rotation.y;
@@ -207,6 +212,38 @@ export class MyFlock {
     return steer;
   }
 
+  _avoidPredators(fish) {
+    const steer = new THREE.Vector3(0, 0, 0);
+    const dangerRadius = this.perceptionRadius * 1.5;
+    
+    for (const predator of this.dangerousEntities) {
+      const predatorPos = predator.group?.position || predator.fishGroup?.position || predator.position;
+      if (!predatorPos) continue;
+      
+      const distance = fish.fishGroup.position.distanceTo(predatorPos);
+      
+      if (distance < dangerRadius && distance > 0) {
+        const diff = new THREE.Vector3();
+        diff.subVectors(fish.fishGroup.position, predatorPos);
+        diff.normalize();
+        
+        const urgency = 1 - (distance / dangerRadius);
+        diff.multiplyScalar(urgency * urgency);
+        
+        steer.add(diff);
+      }
+    }
+    
+    if (steer.length() > 0) {
+      steer.normalize();
+      steer.multiplyScalar(this.maxSpeed);
+      steer.sub(fish.boidVelocity);
+      this._limitVector(steer, this.maxForce * 1.5);
+    }
+    
+    return steer;
+  }
+
   _getNeighbors(fish, fishIndex) {
     const neighbors = [];
     
@@ -232,13 +269,16 @@ export class MyFlock {
     return vector;
   }
 
-  _wrapBoundaries(position, cubeSize) {
+  _bounceBoundaries(position, velocity, cubeSize) {
     const limit = cubeSize * 0.45;
+    const bounce = 0.8;
     
     if (position.x > limit) {
-      position.x = -limit;
-    } else if (position.x < -limit) {
       position.x = limit;
+      velocity.x *= -bounce;
+    } else if (position.x < -limit) {
+      position.x = -limit;
+      velocity.x *= -bounce;
     }
     
     const topY = cubeSize * 0.35;
@@ -246,14 +286,18 @@ export class MyFlock {
     
     if (position.y > topY) {
       position.y = topY;
+      velocity.y *= -bounce;
     } else if (position.y < bottomY) {
       position.y = bottomY;
+      velocity.y *= -bounce;
     }
     
     if (position.z > limit) {
-      position.z = -limit;
-    } else if (position.z < -limit) {
       position.z = limit;
+      velocity.z *= -bounce;
+    } else if (position.z < -limit) {
+      position.z = -limit;
+      velocity.z *= -bounce;
     }
   }
 
@@ -269,9 +313,23 @@ export class MyFlock {
     if (params.separationWeight !== undefined) this.separationWeight = params.separationWeight;
     if (params.alignmentWeight !== undefined) this.alignmentWeight = params.alignmentWeight;
     if (params.cohesionWeight !== undefined) this.cohesionWeight = params.cohesionWeight;
+    if (params.predatorAvoidanceWeight !== undefined) this.predatorAvoidanceWeight = params.predatorAvoidanceWeight;
     if (params.perceptionRadius !== undefined) this.perceptionRadius = params.perceptionRadius;
     if (params.maxSpeed !== undefined) this.maxSpeed = params.maxSpeed;
     if (params.maxForce !== undefined) this.maxForce = params.maxForce;
+  }
+
+  addDangerousEntity(entity) {
+    if (entity && !this.dangerousEntities.includes(entity)) {
+      this.dangerousEntities.push(entity);
+    }
+  }
+
+  removeDangerousEntity(entity) {
+    const index = this.dangerousEntities.indexOf(entity);
+    if (index > -1) {
+      this.dangerousEntities.splice(index, 1);
+    }
   }
 
   dispose() {
