@@ -8,7 +8,7 @@ class MyCube {
         this.material = null;
         
         this.properties = {
-            visible: true,
+            visible: false,
             diffuseColor: "#d9f2f6ff",
             transparency: 0.3,
             size: size
@@ -35,6 +35,7 @@ class MyCube {
         this.mesh = new THREE.Mesh(geometry, this.material);
         
         this.mesh.position.set(0, 0, 0);
+        this.mesh.visible = this.properties.visible;
 
         this.mesh.castShadow = false;
         this.mesh.receiveShadow = false;
