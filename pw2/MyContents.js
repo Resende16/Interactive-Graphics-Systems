@@ -13,6 +13,7 @@ import { MySubmarine } from './objects/MySubmarine.js';
 import { MycoralForest } from './objects/MyCoralForest.js';
 import { MyShark } from './objects/MyShark.js';
 import { MyTurtle } from './objects/MyTurtle.js';
+import { MyFlock } from './objects/MyFlock.js';
 
 
 class MyContents {
@@ -33,6 +34,7 @@ class MyContents {
         this.forbidden = [];
         this.MycoralForest = null;
         this.turtle = null;
+        this.flock = null;
         this.groups = {};
     }
 
@@ -74,6 +76,8 @@ class MyContents {
         }
 
         this.createFishes();
+
+        this.createFishSchool();
 
         this.createSharks();
 
@@ -194,26 +198,19 @@ class MyContents {
     createFishSchool() {
         const s = this.cubeSize;
 
-        this.schoolLeader = new MyFish(this.app, {
-            swimSpeed: 1.0, showCurves: false
+        this.flock = new MyFlock(this.app, {
+            groupSize: 20,
+            perceptionRadius: 3.5,
+            maxSpeed: 5.0,
+            maxForce: 0.2,
+            separationWeight: 1.5,
+            alignmentWeight: 1.0,
+            cohesionWeight: 1.0,
+            boundaryWeight: 1.0,
+            cubeSize: s
         });
-        this.schoolLeader.init();
-        this.schoolLeader.fishGroup.scale.setScalar(s * 0.03);
-        this.fishes.push(this.schoolLeader);
-
-        for (let i = 0; i < 6; i++) {
-            const follower = new MyFish(this.app, {
-                showCurves: false,
-                swimSpeed: 0.9
-            });
-            follower.init();
-            follower.fishGroup.scale.setScalar(s * 0.02);
-
-            follower.isFollower = true;
-            follower.followTarget = this.schoolLeader;
-
-            this.fishes.push(follower);
-        }
+        
+        this.flock.init();
     }
 
     setPlantsWireframe(value) {
@@ -236,6 +233,10 @@ class MyContents {
 
         for (const shark of this.sharks)
             shark.update(delta, this.cubeSize);
+
+        if (this.flock) {
+            this.flock.update(delta, this.cubeSize);
+        }
 
         if (this.submarine) {
             this.submarine.update();
