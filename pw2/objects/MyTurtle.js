@@ -17,7 +17,7 @@ class MyTurtle {
     this.app.scene.add(this.group);
 
     const s = this.cubeSize;
-    this.group.position.set(5, 0, 5);
+    this.group.position.set(5, -5.5, 5);
     this.group.scale.setScalar(s * 0.05); 
     
     const targetPos = this.group.position.clone().add(this.direction);

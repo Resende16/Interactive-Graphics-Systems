@@ -215,10 +215,6 @@ class MySubmarine {
     }
 
     _onKeyDown(e) {
-        if (e.code === "KeyL") {
-            this.headlight.visible = !this.headlight.visible;
-            return;
-        }
         this.keys.add(e.code);
     }
     
@@ -241,6 +237,10 @@ class MySubmarine {
         const forward = new THREE.Vector3(1, 0, 0).applyQuaternion(this.group.quaternion);      
         if (this.keys.has("KeyW")) this.group.position.addScaledVector(forward, move);
         if (this.keys.has("KeyS")) this.group.position.addScaledVector(forward, -move);
+
+        // Vertical movement with P (up) and L (down)
+        if (this.keys.has("KeyP")) this.group.position.y += move;
+        if (this.keys.has("KeyL")) this.group.position.y -= move;
 
         if (this.warningLight) {
             this.warningLightPhase += dt * 2 * Math.PI * 2; 
