@@ -100,9 +100,13 @@ class MyApp {
     }
 
     switchCamera(name) {
-        this.activeCamera = this.cameras.getCamera(name);
-        this.controls.object = this.activeCamera;
-        this.controls.update();
+        // Use MyCameras helper to set active camera, then update local refs
+        this.cameras.setActive(name);
+        this.activeCamera = this.cameras.activeCamera;
+        if (this.controls) {
+            this.controls.object = this.activeCamera;
+            this.controls.update();
+        }
     }
 
     animate() {

@@ -60,8 +60,14 @@ class MyGuiInterface {
 
         cameraFolder
             .add(this.app.cameras, 'activeCameraName', camNames)
-            .name("Active Camera")
-            .onChange(value => this.app.cameras.setActive(value));
+            .name('Active Camera')
+            .onChange(value => this.app.switchCamera(value));
+
+        // Toggle orbit controls (useful to enable free-fly interaction)
+        const controlsParams = { enableControls: !!this.app.controls?.enabled };
+        cameraFolder.add(controlsParams, 'enableControls').name('Enable Controls').onChange(v => {
+            if (this.app.controls) this.app.controls.enabled = v;
+        });
 
         // Live update for camera position
         const pos = this.app.cameras.activeCamera.position;
