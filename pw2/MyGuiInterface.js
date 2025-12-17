@@ -145,6 +145,32 @@ class MyGuiInterface {
                 
             });
 
+        if (this.contents.flock) {
+            const flockFolder = this.datgui.addFolder('Fish Flocking');
+            flockFolder.open();
+
+            flockFolder.add(this.contents.flock, 'separationWeight', 0.0, 5.0, 0.1)
+                .name('Separation');
+            
+            flockFolder.add(this.contents.flock, 'alignmentWeight', 0.0, 5.0, 0.1)
+                .name('Alignment');
+            
+            flockFolder.add(this.contents.flock, 'cohesionWeight', 0.0, 5.0, 0.1)
+                .name('Cohesion');
+            
+            flockFolder.add(this.contents.flock, 'predatorAvoidanceWeight', 0.0, 5.0, 0.1)
+                .name('Predator Avoidance');
+            
+            flockFolder.add(this.contents.flock, 'perceptionRadius', 1.0, 10.0, 0.5)
+                .name('Perception Radius');
+            
+            flockFolder.add(this.contents.flock, 'maxSpeed', 1.0, 15.0, 0.5)
+                .name('Max Speed');
+            
+            flockFolder.add(this.contents.flock, 'maxForce', 0.05, 1.0, 0.05)
+                .name('Max Force');
+        }
+
 
     }
 }
